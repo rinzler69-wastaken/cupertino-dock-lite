@@ -39,7 +39,6 @@ Main.uiGroup.add_child(this._iconsContainer);
       can_focus: false
     });
 
-    // CHANGE: Add directly to uiGroup
     Main.uiGroup.add_child(this._dotsContainer);
 
     this._enabled = true;
@@ -48,8 +47,6 @@ Main.uiGroup.add_child(this._iconsContainer);
     this._relayout = 8;
     this.show_dots = true;
     this._badgeManager = new BadgeManager();
-    // When badge state changes, wake the loop so active clones can refresh
-    // their badge geometry/counts.
     this._badgeManager.onRebuild = () => {
       // Wake the loop so updateIcon() can refresh clone badge geometry/counts.
       this._startAnimation();
@@ -284,30 +281,6 @@ let pos = this._get_position(icon._bin);
       const forceClone = icon._forceClone === true;
       const cloneActive = isActive || forceClone;
 
-      const canAffectLayout = (!this.extension._isHidden || jumping);
-      if (canAffectLayout && cloneActive) {
-        let sz = Math.round(iconSize);
-        let pad = Math.round(12 * scaleFactor);
-        if (dock_position === 'top' || dock_position === 'bottom') {
-          icon._bin.set_width(sz);
-          if (icon._appwell?.get_parent()) icon._appwell.get_parent().set_width(sz + pad);
-        } else {
-          icon._bin.set_height(sz);
-          if (icon._appwell?.get_parent()) icon._appwell.get_parent().set_height(sz + pad);
-        }
-      } else if (canAffectLayout) {
-        // Fully restore native layout constraints when the clone is inactive,
-        // otherwise fixed widths/heights can keep icons spaced apart.
-        let sz = Math.round(iconSize);
-        if (dock_position === 'top' || dock_position === 'bottom') {
-          icon._bin.set_width(sz);
-          if (icon._appwell?.get_parent()) icon._appwell.get_parent().set_width(-1);
-        } else {
-          icon._bin.set_height(sz);
-          if (icon._appwell?.get_parent()) icon._appwell.get_parent().set_height(-1);
-        }
-      }
-
       if (icon._bin.first_child) icon._bin.first_child.opacity = cloneActive ? 0 : 255;
       this._setD2dBadgeOpacity(icon._appwell, cloneActive ? 0 : 255);
       icon.visible = cloneActive;
@@ -362,18 +335,18 @@ let pos = this._get_position(icon._bin);
   }
 
 
-  _onFocusWindow() { this._relayout = 8; if (!this._intervalId) this._startAnimation(); }
+  // _onFocusWindow() { this._relayout = 8; if (!this._intervalId) this._startAnimation(); }
 
-  _onFullScreen() {
-    if (!this._iconsContainer) return;
-    if (!this._isInFullscreen()) { this._iconsContainer.show(); this._dotsContainer.show(); }
-    else { this._iconsContainer.hide(); this._dotsContainer.hide(); }
-  }
+  // _onFullScreen() {
+  //   if (!this._iconsContainer) return;
+  //   if (!this._isInFullscreen()) { this._iconsContainer.show(); this._dotsContainer.show(); }
+  //   else { this._iconsContainer.hide(); this._dotsContainer.hide(); }
+  // }
 
-  _isInFullscreen() {
-    let m = this.dashContainer.monitor || this.dashContainer._monitor;
-    return m ? m.inFullscreen : false;
-  }
+  // _isInFullscreen() {
+  //   let m = this.dashContainer.monitor || this.dashContainer._monitor;
+  //   return m ? m.inFullscreen : false;
+  // }
 
   _startAnimation() { this._beginAnimation(); }
 
