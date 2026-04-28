@@ -422,35 +422,48 @@ this.dashContainer._animateOut = (time, delay) => {
     return icons;
   }
 
-  _patchTrashUnpinDrop() {
-    if (!this.dash || this.dash._cupertinoTrashUnpinPatched) return;
+_patchTrashUnpinDrop() {
+  if (!this.dash || this.dash._cupertinoTrashUnpinPatched) return;
 
-    const originalHandleDragOver = this.dash.handleDragOver?.bind(this.dash);
-    const originalAcceptDrop = this.dash.acceptDrop?.bind(this.dash);
+  const originalHandleDragOver = this.dash.handleDragOver?.bind(this.dash);
+  const originalAcceptDrop = this.dash.acceptDrop?.bind(this.dash);
 
-    this.dash._cupertinoTrashUnpinPatched = {
-      handleDragOver: this.dash.handleDragOver,
-      acceptDrop: this.dash.acceptDrop,
-    };
+  this.dash._cupertinoTrashUnpinPatched = {
+    handleDragOver: this.dash.handleDragOver,
+    acceptDrop: this.dash.acceptDrop,
+  };
 
-    this.dash.handleDragOver = (source, actor, x, y, time) => {
-      if (this._canUnpinDraggedFavoriteOnTrash(source) && this._isPointerOverTrash()) {
+  this.dash.handleDragOver = (source, actor, x, y, time) => {
+    // 1. Check if we are over the trash first
+    if (this._isPointerOverTrash()) {
+      // 2. If it's a favorite, allow the drop (to trigger unpinning)
+      if (this._canUnpinDraggedFavoriteOnTrash(source)) {
         return DND.DragMotionResult.MOVE_DROP;
       }
+      // 3. If it's NOT a favorite, explicitly return NO_DROP 
+      //    to prevent the dock from trying to pin it.
+      return DND.DragMotionResult.NO_DROP;
+    }
 
-      return originalHandleDragOver?.(source, actor, x, y, time) ?? DND.DragMotionResult.CONTINUE;
-    };
+    return originalHandleDragOver?.(source, actor, x, y, time) ?? DND.DragMotionResult.CONTINUE;
+  };
 
-    this.dash.acceptDrop = (source, actor, x, y, time) => {
-      if (this._canUnpinDraggedFavoriteOnTrash(source) && this._isPointerOverTrash()) {
-        const app = this._getDraggedApp(source);
-        AppFavorites.getAppFavorites().removeFavorite(app.get_id());
-        return true;
-      }
+  this.dash.acceptDrop = (source, actor, x, y, time) => {
+    // 1. If over trash and it's a favorite, remove it
+    if (this._isPointerOverTrash() && this._canUnpinDraggedFavoriteOnTrash(source)) {
+      const app = this._getDraggedApp(source);
+      AppFavorites.getAppFavorites().removeFavorite(app.get_id());
+      return true;
+    }
+    
+    // 2. If over trash but NOT a favorite, return false to block the drop
+    if (this._isPointerOverTrash()) {
+      return false;
+    }
 
-      return originalAcceptDrop?.(source, actor, x, y, time) ?? false;
-    };
-  }
+    return originalAcceptDrop?.(source, actor, x, y, time) ?? false;
+  };
+}
 
   _unpatchTrashUnpinDrop() {
     if (!this.dash?._cupertinoTrashUnpinPatched) return;
