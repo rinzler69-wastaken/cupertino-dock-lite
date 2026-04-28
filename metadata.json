@@ -1,6 +1,6 @@
 {
-  "description": "Adds macOS-style bounce animations to your Dash to Dock icons — apps bounce when launched, and urgent notifications trigger a repeating bounce until acknowledged. Includes optional dock theming with light/dark variants.",
-  "name": "Cupertino Dock Lite",
+  "description": "Adds macOS-style bounce animations and optional dock theming, as well as Quality of Life improvements for Dash to Dock.",
+  "name": "WACK - Cupertino Dock Lite",
   "original-authors": [
     "rinzler69-wastaken"
   ],

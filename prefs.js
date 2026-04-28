@@ -16,6 +16,82 @@ export default class DashAnimatorPreferences extends ExtensionPreferences {
     fillPreferencesWindow(window) {
         const settings = this.getSettings('org.gnome.shell.extensions.cupertino-dock-lite');
 
+        // ── Home page ────────────────────────────────────────────────────────
+        const homePage = new Adw.PreferencesPage({
+            title: 'Home',
+            icon_name: 'go-home-symbolic',
+        });
+
+        const homeGroup = new Adw.PreferencesGroup();
+        const homeBox = new Gtk.Box({
+            orientation: Gtk.Orientation.VERTICAL,
+            halign: Gtk.Align.CENTER,
+            valign: Gtk.Align.CENTER,
+            spacing: 12,
+            margin_top: 32,
+            margin_bottom: 32,
+            margin_start: 24,
+            margin_end: 24,
+        });
+
+        const icon = new Gtk.Image({
+            icon_name: 'plank',
+            pixel_size: 128,
+        });
+        homeBox.append(icon);
+
+        const titleLabel = new Gtk.Label({
+            label: this.metadata.name,
+            css_classes: ['title-1'],
+            justify: Gtk.Justification.CENTER,
+            halign: Gtk.Align.CENTER,
+        });
+        homeBox.append(titleLabel);
+
+        const descriptionLabel = new Gtk.Label({
+            label: this.metadata.description,
+            css_classes: ['dim-label'],
+            justify: Gtk.Justification.CENTER,
+            halign: Gtk.Align.CENTER,
+            wrap: true,
+            max_width_chars: 60,
+        });
+        homeBox.append(descriptionLabel);
+
+        homeGroup.add(homeBox);
+        homePage.add(homeGroup);
+
+        // ── Resources group ──────────────────────────────────────────────────
+        const resourcesGroup = new Adw.PreferencesGroup({ title: 'Resources' });
+
+        const repoRow = new Adw.ActionRow({
+            title: 'Extension Repo',
+            subtitle: 'github.com/rinzler69-wastaken/cupertino-dock-lite',
+        });
+
+        const githubIcon = new Gtk.Image({
+            icon_name: 'system-software-install-symbolic',
+            pixel_size: 32,
+            valign: Gtk.Align.CENTER,
+        });
+        repoRow.add_prefix(githubIcon);
+
+        const openBtn = new Gtk.Button({
+            icon_name: 'adw-external-link-symbolic',
+            tooltip_text: 'Open on GitHub',
+            css_classes: ['flat'],
+            valign: Gtk.Align.CENTER,
+        });
+        openBtn.connect('clicked', () => {
+            Gtk.show_uri(window, this.metadata.url, GLib.CURRENT_TIME);
+        });
+        repoRow.add_suffix(openBtn);
+
+        resourcesGroup.add(repoRow);
+        homePage.add(resourcesGroup);
+
+        window.add(homePage);
+
         // ── Animation page ────────────────────────────────────────────────────
         const animPage = new Adw.PreferencesPage({
             title: 'Animation',
@@ -125,10 +201,8 @@ export default class DashAnimatorPreferences extends ExtensionPreferences {
         bigsurBtn.connect('toggled', () => { 
             if (bigsurBtn.active) settings.set_string('dock-theme', 'bigsur'); 
         });
-        
 
         settings.connect('changed::dock-theme', syncThemeButtons);
-        themeRow.add_suffix(themeBox);
         themeRow.add_suffix(themeBox);
         themeStyleGroup.add(themeRow);
 
@@ -168,9 +242,7 @@ export default class DashAnimatorPreferences extends ExtensionPreferences {
             if (darkBtn.active) settings.set_string('dock-color-scheme', 'dark'); 
         });
 
-
         settings.connect('changed::dock-color-scheme', syncColorButtons);
-        colorRow.add_suffix(colorBox);
         colorRow.add_suffix(colorBox);
         colorGroup.add(colorRow);
 
@@ -193,7 +265,6 @@ export default class DashAnimatorPreferences extends ExtensionPreferences {
             title: 'Extras',
             icon_name: 'emblem-system-symbolic',
         });
-
 
         // CAMLE Patcher group
         const camleGroup = new Adw.PreferencesGroup({
