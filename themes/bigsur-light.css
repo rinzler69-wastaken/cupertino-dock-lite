@@ -168,7 +168,20 @@
   border-radius: 6px;
   border: 1px solid rgba(34, 34, 38, 0.15);
   font-weight: 500;
+}
+
+.dash-label.bottom.shrink {
   margin-bottom: 18px !important;
+}
+
+.dash-label.left.shrink {
+  margin-bottom: 0 !important;
+  margin-left: 18px !important;
+}
+
+.dash-label.right.shrink {
+  margin-bottom: 0 !important;
+  margin-right: 18px !important;
 }
 
 
