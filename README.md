@@ -18,7 +18,7 @@ Choose from two dock themes — Mojave (flush to screen edge, 10px radius) and B
 App icons bounce when launching or urgent, with tunable speed and bounce height. <br><br>
 - **Magic Lamp Integration** <br>
 One-click patcher for the **[Compiz-alike Magic Lamp Effect](https://github.com/hermes83/compiz-alike-magic-lamp-effect)** that fixes two rough edges: windows no longer slip beneath the dock gap when minimizing, and bilinear filtering smooths out the effect's jagged edges.<br><br>
-- **Drag-to-Trash to unpin App Icons** <br>
+- **Drag-to-Trash** <br>
 Simply drag an app icon to trash to unpin it.
 
 ## Best Used With
