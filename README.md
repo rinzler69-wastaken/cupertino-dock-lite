@@ -13,9 +13,9 @@ This specific extension focuses on the Dock, with macOS-inspired theming (Mojave
 
 ## Features
 - **macOS-inspired Theming** <br>
-Choose from two dock themes — Mojave (flush to screen edge, 10px radius) and Big Sur (floating, 22px radius) — in light, dark, or system-synced color. Includes macOS-style notification badge styling. Theming can be toggled off under Theme → Override Theming.
+Choose from two dock themes — Mojave (flush to screen edge, 10px radius) and Big Sur (floating, 22px radius) — in light, dark, or system-synced color. Includes macOS-style notification badge styling. Theming can be toggled off under Theme → Override Theming. <br>
 - **macOS-inspired Launch Animation** <br>
-App icons bounce when launching or urgent, with tunable speed and bounce height.
+App icons bounce when launching or urgent, with tunable speed and bounce height. <br>
 - **Magic Lamp Integration** <br>
 One-click patcher for the **[Compiz-alike Magic Lamp Effect](https://github.com/hermes83/compiz-alike-magic-lamp-effect)** that fixes two rough edges: windows no longer slip beneath the dock gap when minimizing, and bilinear filtering smooths out the effect's jagged edges.
 
