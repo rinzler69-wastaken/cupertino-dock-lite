@@ -1,4 +1,4 @@
-# WACK – Cupertino Lite Dock
+# WACK – Cupertino Dock Lite
 
 A stripped down, and currently maintained lightweight fork, of **[Dash Cupertinisator](github.com/rinzler69-wastaken/dash-cupertinisator)**.
 
