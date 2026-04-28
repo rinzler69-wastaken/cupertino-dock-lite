@@ -9,18 +9,18 @@
 
 This is a part of the WACK project (WACK Ain't Cupertino, Kid), a collection of tweaks aimed at bringing a refined, macOS-inspired aesthetic to the GNOME desktop.
 
-This specific extension focuses on the Dock (derived from GNOME Dash by Dash to Dock), giving bounce animations for running and urgent apps, as well as theming your dock with Mojave or Big Sur inspired themes.
+This specific extension focuses on the Dock, with macOS-inspired theming (Mojave and Big Sur styles) and bounce animations for launching and urgent apps.
 
-## Features, and What it does
-- Custom, macOS inspired Theming: Lets you choose from two dock themes: Mojave and Big Sur (Mojave style sticks flush to the screen edge, 10px border radius, Big Sur floats above it, 22px border radius).
-- Custom, macOS inspired Animations:  Animates launching apps' icons with bounce animation, of which you can tune the speed, and the height of the bounce.
+## Features
+- **macOS-inspired Theming:** Choose from two dock themes — Mojave (flush to screen edge, 10px radius) and Big Sur (floating, 22px radius) — in light, dark, or system-synced color. Includes macOS-style notification badge styling. Theming can be toggled off under Theme → Override Theming.
+- **macOS-inspired Launch Animation**
+App icons bounce when launching or urgent, with tunable speed and bounce height.
 
 ## Best Used With
-This extension is made as a companion extension to **[Dash to Dock](https://github.com/micheleg/dash-to-dock/)**. In order for this extension to work, install Dash to Dock first.
+This extension is a companion to **[Dash to Dock](https://github.com/micheleg/dash-to-dock/)** — install it first for this extension to work. 
 
 
 ## Install / update (one-step Makefile)
-Prereqs: `make`, `rsync`, GNOME Shell 48–50.
 
 ```bash
 git clone https://github.com/rinzler69-wastaken/cupertino-dock-lite.git
