@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="cupertino-dock-lite">
+  <schema id="org.gnome.shell.extensions.cupertino-dock-lite" path="/org/gnome/shell/extensions/cupertino-dock-lite/">
+    <key name="jump-height" type="d">
+      <default>0.85</default>
+      <summary>Jump Height</summary>
+      <description>How high icons jump when clicked or starting.</description>
+    </key>
+    <key name="jump-speed" type="d">
+      <default>1.0</default>
+      <summary>Jump Speed</summary>
+      <description>The speed of the icon jump animation.</description>
+    </key>
+    <key name="override-theming" type="b">
+      <default>false</default>
+      <summary>Override Dock Theming</summary>
+      <description>Apply macOS-inspired dock styling on top of Dash to Dock.</description>
+    </key>
+    <key name="dock-theme" type="s">
+      <default>'bigsur'</default>
+      <summary>Dock Theme</summary>
+      <description>Which macOS dock theme to apply. Either 'mojave' or 'bigsur'.</description>
+    </key>
+    <key name="theme-aware" type="b">
+      <default>true</default>
+      <summary>Follow System Theme</summary>
+      <description>Automatically switch between light and dark dock theme with the system.</description>
+    </key>
+    <key name="dock-color-scheme" type="s">
+      <default>'dark'</default>
+      <summary>Dock Color Scheme</summary>
+      <description>Manual light/dark selection when theme-aware is off. Either 'light' or 'dark'.</description>
+    </key>
+    <key name="show-badges" type="b">
+      <default>true</default>
+      <summary>Show Notification Badges</summary>
+      <description>Show notification badge dots on dock icons. Greyed out when Dash to Dock has badges disabled.</description>
+    </key>
+    <key name="show-count" type="b">
+      <default>true</default>
+      <summary>Show Unread Count Number</summary>
+      <description>Show the physical number of unread notifications inside the badge.</description>
+    </key>
+<key name="always-hide" type="b">
+  <default>false</default>
+  <summary>Always Hide Dock</summary>
+  <description>Keep the dock permanently hidden. It only appears in the GNOME overview.</description>
+</key>
+  </schema>
+</schemalist>

@@ -1,0 +1,21 @@
+{
+  "description": "Adds macOS-style bounce animations to your Dash to Dock icons — apps bounce when launched, and urgent notifications trigger a repeating bounce until acknowledged. Includes optional dock theming with light/dark variants.",
+  "name": "Cupertino Dock Lite",
+  "original-authors": [
+    "rinzler69-wastaken"
+  ],
+  "shell-version": [
+    "45",
+    "46",
+    "47",
+    "48",
+    "49",
+    "50"
+  ],
+  "url": "https://github.com/rinzler69-wastaken/cupertino-dock-lite",
+  "uuid": "cupertino-dock-lite@rinzler69-wastaken.github.com",
+  "schema-id": "org.gnome.shell.extensions.cupertino-dock-lite",
+  "gettext-domain": "cupertino-dock-lite",
+  "settings-schema": "org.gnome.shell.extensions.cupertino-dock-lite",
+  "version": 1.1
+}

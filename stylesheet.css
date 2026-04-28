@@ -1,0 +1,28 @@
+/* Add your custom extension styling here */
+/* stylesheet.css — cupertino-dock-lite */
+
+.dock-shadow-clone {
+  background-color: transparent !important;
+  border-radius: 999px;
+  /* Clone is oversized by SPREAD px on each side so shadow bleeds freely outside pill */
+  box-shadow:
+    0 10px 40px 4px rgba(0, 0, 0, 0.55),
+    0 4px  12px 0px rgba(0, 0, 0, 0.32);
+}
+
+.invisible {
+	/*border:  1px solid magenta;*/
+	color:  rgba(255,0,255,0);
+}
+
+.hi {
+	border:  1px solid magenta;
+}
+
+  /*#dashtodockContainer.bottom #dash .dash-item-container .app-well-app.focused .overview-icon {
+    background-color: rgba(238, 238, 236, 0.08) !important; }*/
+    
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app.running .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile.running .overview-icon {
+  background-image: none;
+}

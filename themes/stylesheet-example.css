@@ -1,0 +1,665 @@
+.dash-item-container .overview-tile .overview-icon,
+.dash-item-container .show-apps .overview-icon {
+    background-color: rgba(255, 255, 255, 0);
+}
+
+.dash-item-container .overview-tile:hover .overview-icon,
+.dash-item-container .overview-tile.focused .overview-icon,
+.dash-item-container .show-apps:hover .overview-icon {
+    background-color: rgba(238, 238, 238, 0.2);
+}
+
+.dash-item-container .overview-tile .app-grid-running-dot {
+    margin-bottom: 8px;
+    offset-y: 2px;
+}
+
+#dashtodockContainer.bottom #dash {
+    margin: 0px;
+    padding: 0px;
+}
+
+#dashtodockContainer.bottom #dash .dash-background {
+    margin: 0;
+    margin-bottom: 4px;
+    padding: 0;
+    border-radius: 24px;
+    spacing: 6px;
+}
+
+#dashtodockContainer.bottom #dash .dash-separator {
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 0 4px;
+    width: 1px;
+    height: 0;
+    margin-bottom: 4px;
+}
+
+#dashtodockContainer.bottom #dash #dashtodockDashContainer {
+    padding: 10px;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+#dashtodockContainer.bottom #dash .dash-item-container {
+    /* Disable all margins defined upstream, we handle them here */
+    margin: 0 2px;
+}
+
+#dashtodockContainer.bottom #dash .dash-item-container>* {
+    margin: 0;
+}
+
+#dashtodockContainer.bottom #dash .dash-item-container:ltr:first-child,
+#dashtodockContainer.bottom #dash .dash-item-container:rtl:last-child {
+    margin-left: 0;
+}
+
+#dashtodockContainer.bottom #dash .dash-item-container:ltr:last-child,
+#dashtodockContainer.bottom #dash .dash-item-container:rtl:first-child {
+    margin-right: 0;
+}
+
+#dashtodockContainer.bottom #dash .dash-item-container .app-well-app,
+#dashtodockContainer.bottom #dash .dash-item-container .show-apps,
+#dashtodockContainer.bottom #dash .dash-item-container .overview-tile {
+    padding: 2px 2px;
+    padding-bottom: 14px;
+    padding-top: 10px;
+}
+
+#dashtodockContainer.bottom #dash .dash-item-container .app-well-app:ltr:first-child,
+#dashtodockContainer.bottom #dash .dash-item-container .app-well-app:rtl:last-child,
+#dashtodockContainer.bottom #dash .dash-item-container .show-apps:ltr:first-child,
+#dashtodockContainer.bottom #dash .dash-item-container .show-apps:rtl:last-child,
+#dashtodockContainer.bottom #dash .dash-item-container .overview-tile:ltr:first-child,
+#dashtodockContainer.bottom #dash .dash-item-container .overview-tile:rtl:last-child {
+    padding-left: 0;
+}
+
+#dashtodockContainer.bottom #dash .dash-item-container .app-well-app:ltr:last-child,
+#dashtodockContainer.bottom #dash .dash-item-container .app-well-app:rtl:first-child,
+#dashtodockContainer.bottom #dash .dash-item-container .show-apps:ltr:last-child,
+#dashtodockContainer.bottom #dash .dash-item-container .show-apps:rtl:first-child,
+#dashtodockContainer.bottom #dash .dash-item-container .overview-tile:ltr:last-child,
+#dashtodockContainer.bottom #dash .dash-item-container .overview-tile:rtl:first-child {
+    padding-right: 0;
+}
+
+#dashtodockContainer.bottom #dash .dash-item-container .app-well-app.updating,
+#dashtodockContainer.bottom #dash .dash-item-container .show-apps.updating,
+#dashtodockContainer.bottom #dash .dash-item-container .overview-tile.updating {
+    opacity: 0.5;
+}
+
+#dashtodockContainer.bottom #dash .dash-item-container .app-well-app.running .overview-icon,
+#dashtodockContainer.bottom #dash .dash-item-container .overview-tile.running .overview-icon {
+    background-image: none;
+}
+
+
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile .overview-icon {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app.focused .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile.focused .overview-icon {
+    background-color: rgba(255, 255, 255, 0.12);
+
+
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.45),
+        inset 0 -1px 2px rgba(255, 255, 255, 0.05);
+
+    border-radius: 18px;
+    /* match your icon rounding */
+}
+
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app:hover .overview-icon {
+    background-color: transparent;
+}
+
+
+
+#dashtodockContainer.bottom #dash .dash-item-container .app-well-app .app-well-app-running-dot,
+#dashtodockContainer.bottom #dash .dash-item-container .app-well-app .app-grid-running-dot,
+#dashtodockContainer.bottom #dash .dash-item-container .overview-tile .app-well-app-running-dot,
+#dashtodockContainer.bottom #dash .dash-item-container .overview-tile .app-grid-running-dot {
+    margin-bottom: 2px;
+}
+
+#dashtodockContainer.bottom #dash .dash-item-container>StButton {
+    transition-duration: 250;
+    background-size: contain;
+}
+
+#dashtodockContainer.bottom.fixed #dash .dash-background {
+    margin-top: 4px;
+}
+
+#dashtodockContainer.bottom.fixed #dash .dash-item-container .app-well-app,
+#dashtodockContainer.bottom.fixed #dash .dash-item-container .show-apps {
+    padding-top: 14px;
+}
+
+.dash-label.bottom {
+    margin-bottom: 10px;
+    -x-offset: 0;
+    -y-offset: 0;
+}
+
+
+
+#dashtodockContainer.bottom {
+    overflow: visible;
+}
+
+#dashtodockContainer.bottom.shrink #dash {
+    margin: 0px;
+    padding: 0px;
+}
+
+#dashtodockContainer.bottom.shrink #dash .dash-background {
+    margin: 0;
+    margin-bottom: 7px;
+    overflow: visible;
+    padding: 0px;
+    /*border-radius: 10px 10px 0 0;*/
+    border-radius: 22px;
+    spacing: 4px;
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+}
+
+#dashtodockContainer.bottom.shrink #dash .dash-separator {
+    background-color: rgba(255, 255, 255, 0.1);
+    /*margin: 1px 2px;*/
+    width: 1.5px;
+    height: 2px;
+    margin-bottom: 7.5px;
+}
+
+#dashtodockContainer.bottom.shrink #dash #dashtodockDashContainer {
+    padding: 3px 2px;
+    /* top/bottom 8px, left/right 6px */
+}
+
+#dashtodockContainer.bottom.shrink #dash .dash-item-container {
+    /* Disable all margins defined upstream, we handle them here */
+    margin: 0 -1px;
+}
+
+#dashtodockContainer.bottom.shrink #dash .dash-item-container>* {
+    margin: 0;
+}
+
+#dashtodockContainer.bottom.shrink #dash .dash-item-container:ltr:first-child,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container:rtl:last-child {
+    margin-left: 0;
+}
+
+#dashtodockContainer.bottom.shrink #dash .dash-item-container:ltr:last-child,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container:rtl:first-child {
+    margin-right: 0;
+}
+
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .show-apps,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile {
+    padding: 1px 1px;
+    padding-bottom: 12px;
+    padding-top: 3px;
+}
+
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app:ltr:first-child,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app:rtl:last-child,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .show-apps:ltr:first-child,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .show-apps:rtl:last-child,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile:ltr:first-child,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile:rtl:last-child {
+    padding-left: 0;
+}
+
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app:ltr:last-child,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app:rtl:first-child,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .show-apps:ltr:last-child,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .show-apps:rtl:first-child,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile:ltr:last-child,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile:rtl:first-child {
+    padding-right: 0;
+}
+
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app.updating,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .show-apps.updating,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile.updating {
+    opacity: 0.5;
+}
+
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app.running .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile.running .overview-icon {
+    background-image: none;
+}
+
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app.focused .overview-icon,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile.focused .overview-icon {
+    background-color: rgba(238, 238, 238, 0.1);
+}
+
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app .app-well-app-running-dot,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .app-well-app .app-grid-running-dot,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile .app-well-app-running-dot,
+#dashtodockContainer.bottom.shrink #dash .dash-item-container .overview-tile .app-grid-running-dot {
+    margin-bottom: 0px;
+    -y-offset: 4px;
+}
+
+#dashtodockContainer.bottom.shrink #dash .dash-item-container>StButton {
+    transition-duration: 250;
+    background-size: contain;
+}
+
+#dashtodockContainer.bottom.shrink.fixed #dash .dash-background {
+    margin-top: 1px;
+}
+
+#dashtodockContainer.bottom.shrink.fixed #dash .dash-item-container .app-well-app,
+#dashtodockContainer.bottom.shrink.fixed #dash .dash-item-container .show-apps {
+    padding-top: 4px;
+}
+
+.dash-label.bottom.shrink {
+    margin-bottom: 5px;
+    -x-offset: 0;
+    -y-offset: 0;
+}
+
+#dashtodockContainer.bottom.extended #dash {
+    margin: 0px;
+    padding: 0px;
+}
+
+#dashtodockContainer.bottom.extended #dash .dash-background {
+    margin: 0;
+    margin-bottom: 0;
+    padding: 0;
+    border-radius: 0;
+    spacing: 6px;
+}
+
+#dashtodockContainer.bottom.extended #dash .dash-separator {
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 0 4px;
+    width: 1px;
+    height: 0;
+    margin-bottom: 0;
+}
+
+#dashtodockContainer.bottom.extended #dash #dashtodockDashContainer {
+    padding: 0;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+#dashtodockContainer.bottom.extended #dash #dashtodockDashContainer> :first-child .show-apps {
+    padding-left: 8px;
+}
+
+#dashtodockContainer.bottom.extended #dash #dashtodockDashContainer #dashtodockDashScrollview:first-child {
+    padding-left: 8px;
+}
+
+#dashtodockContainer.bottom.extended #dash #dashtodockDashContainer> :last-child .show-apps {
+    padding-right: 8px;
+}
+
+#dashtodockContainer.bottom.extended #dash #dashtodockDashContainer #dashtodockDashScrollview:last-child {
+    padding-right: 8px;
+}
+
+#dashtodockContainer.bottom.extended #dash .dash-item-container {
+    /* Disable all margins defined upstream, we handle them here */
+    margin: 0 2px;
+}
+
+#dashtodockContainer.bottom.extended #dash .dash-item-container>* {
+    margin: 0;
+}
+
+#dashtodockContainer.bottom.extended #dash .dash-item-container:ltr:first-child,
+#dashtodockContainer.bottom.extended #dash .dash-item-container:rtl:last-child {
+    margin-left: 0;
+}
+
+#dashtodockContainer.bottom.extended #dash .dash-item-container:ltr:last-child,
+#dashtodockContainer.bottom.extended #dash .dash-item-container:rtl:first-child {
+    margin-right: 0;
+}
+
+#dashtodockContainer.bottom.extended #dash .dash-item-container .app-well-app,
+#dashtodockContainer.bottom.extended #dash .dash-item-container .show-apps,
+#dashtodockContainer.bottom.extended #dash .dash-item-container .overview-tile {
+    padding: 2px 2px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+
+#dashtodockContainer.bottom.extended #dash .dash-item-container .app-well-app:ltr:first-child,
+#dashtodockContainer.bottom.extended #dash .dash-item-container .app-well-app:rtl:last-child,
+#dashtodockContainer.bottom.extended #dash .dash-item-container .show-apps:ltr:first-child,
+#dashtodockContainer.bottom.extended #dash .dash-item-container .show-apps:rtl:last-child,
+#dashtodockContainer.bottom.extended #dash .dash-item-container .overview-tile:ltr:first-child,
+#dashtodockContainer.bottom.extended #dash .dash-item-container .overview-tile:rtl:last-child {
+    padding-left: 0;
+}
+
+#dashtodockContainer.bottom.extended #dash .dash-item-container .app-well-app:ltr:last-child,
+#dashtodockContainer.bottom.extended #dash .dash-item-container .app-well-app:rtl:first-child,
+#dashtodockContainer.bottom.extended #dash .dash-item-container .show-apps:ltr:last-child,
+#dashtodockContainer.bottom.extended #dash .dash-item-container .show-apps:rtl:first-child,
+#dashtodockContainer.bottom.extended #dash .dash-item-container .overview-tile:ltr:last-child,
+#dashtodockContainer.bottom.extended #dash .dash-item-container .overview-tile:rtl:first-child {
+    padding-right: 0;
+}
+
+#dashtodockContainer.bottom.extended #dash .dash-item-container .app-well-app.updating,
+#dashtodockContainer.bottom.extended #dash .dash-item-container .show-apps.updating,
+#dashtodockContainer.bottom.extended #dash .dash-item-container .overview-tile.updating {
+    opacity: 0.5;
+}
+
+#dashtodockContainer.bottom.extended #dash .dash-item-container .app-well-app.running .overview-icon,
+#dashtodockContainer.bottom.extended #dash .dash-item-container .overview-tile.running .overview-icon {
+    background-image: none;
+}
+
+#dashtodockContainer.bottom.extended #dash .dash-item-container .app-well-app.focused .overview-icon,
+#dashtodockContainer.bottom.extended #dash .dash-item-container .overview-tile.focused .overview-icon {
+    background-color: rgba(238, 238, 238, 0.2);
+}
+
+#dashtodockContainer.bottom.extended #dash .dash-item-container .app-well-app .app-well-app-running-dot,
+#dashtodockContainer.bottom.extended #dash .dash-item-container .app-well-app .app-grid-running-dot,
+#dashtodockContainer.bottom.extended #dash .dash-item-container .overview-tile .app-well-app-running-dot,
+#dashtodockContainer.bottom.extended #dash .dash-item-container .overview-tile .app-grid-running-dot {
+    margin-bottom: 2px;
+}
+
+#dashtodockContainer.bottom.extended #dash .dash-item-container>StButton {
+    transition-duration: 250;
+    background-size: contain;
+}
+
+#dashtodockContainer.bottom.extended.fixed #dash .dash-background {
+    margin-top: 0;
+}
+
+#dashtodockContainer.bottom.extended.fixed #dash .dash-item-container .app-well-app,
+#dashtodockContainer.bottom.extended.fixed #dash .dash-item-container .show-apps {
+    padding-top: 10px;
+}
+
+.dash-label.bottom {
+    margin-bottom: 10px;
+    -x-offset: 0;
+    -y-offset: 0;
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash {
+    margin: 0px;
+    padding: 0px;
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash .dash-background {
+    margin: 0;
+    margin-bottom: 0;
+    padding: 0;
+    border-radius: 0;
+    spacing: 2px;
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash .dash-separator {
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 0 1px;
+    width: 1px;
+    height: 0;
+    margin-bottom: 0;
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash #dashtodockDashContainer {
+    padding: 0;
+    padding-bottom: 0;
+    padding-top: 0;
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash #dashtodockDashContainer> :first-child .show-apps {
+    padding-left: 6px;
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash #dashtodockDashContainer #dashtodockDashScrollview:first-child {
+    padding-left: 6px;
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash #dashtodockDashContainer> :last-child .show-apps {
+    padding-right: 6px;
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash #dashtodockDashContainer #dashtodockDashScrollview:last-child {
+    padding-right: 6px;
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container {
+    /* Disable all margins defined upstream, we handle them here */
+    margin: 0 2px;
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container>* {
+    margin: 0;
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container:ltr:first-child,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container:rtl:last-child {
+    margin-left: 0;
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container:ltr:last-child,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container:rtl:first-child {
+    margin-right: 0;
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .app-well-app,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .show-apps,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .overview-tile {
+    padding: 1px 1px;
+    padding-bottom: 3px;
+    padding-top: 3px;
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .app-well-app:ltr:first-child,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .app-well-app:rtl:last-child,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .show-apps:ltr:first-child,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .show-apps:rtl:last-child,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .overview-tile:ltr:first-child,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .overview-tile:rtl:last-child {
+    padding-left: 0;
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .app-well-app:ltr:last-child,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .app-well-app:rtl:first-child,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .show-apps:ltr:last-child,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .show-apps:rtl:first-child,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .overview-tile:ltr:last-child,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .overview-tile:rtl:first-child {
+    padding-right: 0;
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .app-well-app.updating,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .show-apps.updating,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .overview-tile.updating {
+    opacity: 0.5;
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .app-well-app.running .overview-icon,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .overview-tile.running .overview-icon {
+    background-image: none;
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .app-well-app.focused .overview-icon,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .overview-tile.focused .overview-icon {
+    background-color: rgba(238, 238, 238, 0.2);
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .app-well-app .app-well-app-running-dot,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .app-well-app .app-grid-running-dot,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .overview-tile .app-well-app-running-dot,
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container .overview-tile .app-grid-running-dot {
+    margin-bottom: 2px;
+}
+
+#dashtodockContainer.bottom.extended.shrink #dash .dash-item-container>StButton {
+    transition-duration: 250;
+    background-size: contain;
+}
+
+#dashtodockContainer.bottom.extended.shrink.fixed #dash .dash-background {
+    margin-top: 0;
+}
+
+#dashtodockContainer.bottom.extended.shrink.fixed #dash .dash-item-container .app-well-app,
+#dashtodockContainer.bottom.extended.shrink.fixed #dash .dash-item-container .show-apps {
+    padding-top: 3px;
+}
+
+.dash-label.bottom.shrink {
+    margin-bottom: 3px;
+    -x-offset: 0;
+    -y-offset: 0;
+}
+
+.dashtodock-app-well-preview-menu-item.bottom {
+    padding: 0.5em 0.5em;
+}
+
+.dashtodock-app-well-preview-menu-item.bottom:ltr:first-child,
+.dashtodock-app-well-preview-menu-item.bottom:rtl:last-child {
+    padding-left: 1em;
+}
+
+.dashtodock-app-well-preview-menu-item.bottom:ltr:last-child,
+.dashtodock-app-well-preview-menu-item.bottom:rtl:first-child {
+    padding-right: 1em;
+}
+
+#dashtodockContainer.top #dash {
+    margin: 0px;
+    padding: 0px;
+}
+
+#dashtodockContainer.top #dash .dash-background {
+    margin: 0;
+    margin-top: 4px;
+    padding: 0;
+    border-radius: 24px;
+    spacing: 6px;
+}
+
+#dashtodockContainer.top #dash .dash-separator {
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 0 4px;
+    width: 1px;
+    height: 0;
+    margin-top: 4px;
+}
+
+#dashtodockContainer.top #dash #dashtodockDashContainer {
+    padding: 10px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+#dashtodockContainer.top #dash .dash-item-container {
+    /* Disable all margins defined upstream, we handle them here */
+    margin: 0 2px;
+}
+
+#dashtodockContainer.top #dash .dash-item-container>* {
+    margin: 0;
+}
+
+#dashtodockContainer.top #dash .dash-item-container:ltr:first-child,
+#dashtodockContainer.top #dash .dash-item-container:rtl:last-child {
+    margin-left: 0;
+}
+
+#dashtodockContainer.top #dash .dash-item-container:ltr:last-child,
+#dashtodockContainer.top #dash .dash-item-container:rtl:first-child {
+    margin-right: 0;
+}
+
+#dashtodockContainer.top #dash .dash-item-container .app-well-app,
+#dashtodockContainer.top #dash .dash-item-container .show-apps,
+#dashtodockContainer.top #dash .dash-item-container .overview-tile {
+    padding: 2px 2px;
+    padding-top: 14px;
+    padding-bottom: 10px;
+}
+
+#dashtodockContainer.top #dash .dash-item-container .app-well-app:ltr:first-child,
+#dashtodockContainer.top #dash .dash-item-container .app-well-app:rtl:last-child,
+#dashtodockContainer.top #dash .dash-item-container .show-apps:ltr:first-child,
+#dashtodockContainer.top #dash .dash-item-container .show-apps:rtl:last-child,
+#dashtodockContainer.top #dash .dash-item-container .overview-tile:ltr:first-child,
+#dashtodockContainer.top #dash .dash-item-container .overview-tile:rtl:last-child {
+    padding-left: 0;
+}
+
+#dashtodockContainer.top #dash .dash-item-container .app-well-app:ltr:last-child,
+#dashtodockContainer.top #dash .dash-item-container .app-well-app:rtl:first-child,
+#dashtodockContainer.top #dash .dash-item-container .show-apps:ltr:last-child,
+#dashtodockContainer.top #dash .dash-item-container .show-apps:rtl:first-child,
+#dashtodockContainer.top #dash .dash-item-container .overview-tile:ltr:last-child,
+#dashtodockContainer.top #dash .dash-item-container .overview-tile:rtl:first-child {
+    padding-right: 0;
+}
+
+#dashtodockContainer.top #dash .dash-item-container .app-well-app.updating,
+#dashtodockContainer.top #dash .dash-item-container .show-apps.updating,
+#dashtodockContainer.top #dash .dash-item-container .overview-tile.updating {
+    opacity: 0.5;
+}
+
+#dashtodockContainer.top #dash .dash-item-container .app-well-app.running .overview-icon,
+#dashtodockContainer.top #dash .dash-item-container .overview-tile.running .overview-icon {
+    background-image: none;
+}
+
+#dashtodockContainer.top #dash .dash-item-container .app-well-app.focused .overview-icon,
+#dashtodockContainer.top #dash .dash-item-container .overview-tile.focused .overview-icon {
+    background-color: rgba(238, 238, 238, 0.2);
+}
+
+#dashtodockContainer.top #dash .dash-item-container .app-well-app .app-well-app-running-dot,
+#dashtodockContainer.top #dash .dash-item-container .app-well-app .app-grid-running-dot,
+#dashtodockContainer.top #dash .dash-item-container .overview-tile .app-well-app-running-dot,
+#dashtodockContainer.top #dash .dash-item-container .overview-tile .app-grid-running-dot {
+    margin-bottom: 2px;
+}
+
+#dashtodockContainer.top #dash .dash-item-container>StButton {
+    transition-duration: 250;
+    background-size: contain;
+}
+
+#dashtodockContainer.top.fixed #dash .dash-background {
+    margin-bottom: 4px;
+}
+
+#dashtodockContainer.top.fixed #dash .dash-item-container .app-well-app,
+#dashtodockContainer.top.fixed #dash .dash-item-container .show-apps {
+    padding-bottom: 14px;
+}
+
+.dash-label.top {
+    margin-top: 10px;
+    -x-offset: 0;
+    -y-offset: 0;
+}
