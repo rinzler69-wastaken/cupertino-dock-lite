@@ -101,13 +101,75 @@ Main.uiGroup.remove_child(this._dotsContainer);
   isJumping() {
     if (!this._iconsContainer) return false;
     let icons = this._iconsContainer.get_children().filter(c => c.name !== 'cupertinisator-badge');
-    // Treat the urgent "quiet gap" as active so auto-hide doesn't cancel
-    // the next bounce cycle.
     return icons.some(i =>
       (i._clickJump > 0) ||
       (i._attentionJump > 0) ||
-      (i._appwell?.urgent && (i._attentionCooldown > 0))
+      (this.extension?.urgent_bounce && i._appwell?._dashAnimatorUrgentFirstRunRemaining > 0) ||
+      (this.extension?.urgent_bounce && !(this.extension?._isHidden) && !(this.extension?._pendingHideForUrgentBounce) && i._appwell?.urgent && (i._attentionCooldown > 0))
     );
+  }
+
+  pauseUrgentBounce() {
+    if (!this._iconsContainer) return;
+    this._iconsContainer.get_children().forEach(icon => {
+      if (!icon._appwell?.urgent) return;
+      icon._appwell._dashAnimatorUrgentBounceActive = true;
+      icon._attentionJump = 0;
+      icon._attentionCooldown = 0;
+      if (!(icon._clickJump > 0)) {
+        if (icon._bin?.first_child) icon._bin.first_child.opacity = 255;
+        this._setD2dBadgeOpacity(icon._appwell, 255);
+        if (icon._badge) icon._badge.visible = false;
+        icon.visible = false;
+      }
+    });
+  }
+
+  resumeUrgentBounce() {
+    if (!this._iconsContainer || this.extension?.urgent_bounce === false) return;
+    let resumed = false;
+    this._iconsContainer.get_children().forEach(icon => {
+      if (!icon._appwell?.urgent || icon._appwell._dashAnimatorUrgentBounceActive === false) return;
+      icon._attentionCooldown = 0;
+      if (!(icon._attentionJump > 0)) icon._attentionJump = 1.0;
+      resumed = true;
+    });
+    if (resumed) this._startAnimation();
+  }
+
+  requestUrgentBounce(appwell, forceFirstRun = false) {
+    if (this.extension?.urgent_bounce === false) return;
+    if (!appwell) return;
+    appwell._dashAnimatorUrgentBounceActive = true;
+    // First-time urgent procedure: keep the dock visible for three bounce
+    // cycles before later hide requests are allowed to pause the urgent state.
+    if (forceFirstRun || !(appwell._dashAnimatorUrgentFirstRunRemaining > 0)) {
+      appwell._dashAnimatorUrgentFirstRunRemaining = 3;
+    }
+
+    const icon = this._findCloneForAppwell(appwell);
+    if (!icon) return;
+
+    icon._attentionCooldown = 0;
+    if (!(icon._attentionJump > 0)) icon._attentionJump = 1.0;
+    this._startAnimation();
+  }
+
+  clearUrgentBounce(appwell) {
+    if (!appwell) return;
+    appwell._dashAnimatorUrgentBounceActive = false;
+    appwell._dashAnimatorUrgentFirstRunRemaining = 0;
+
+    const icon = this._findCloneForAppwell(appwell);
+    if (!icon) return;
+
+    icon._attentionJump = 0;
+    icon._attentionCooldown = 0;
+  }
+
+  _findCloneForAppwell(appwell) {
+    if (!this._iconsContainer) return null;
+    return this._iconsContainer.get_children().find(icon => icon._appwell === appwell) ?? null;
   }
 
 
@@ -213,7 +275,12 @@ Main.uiGroup.remove_child(this._dotsContainer);
             if (icon._appwell.app && icon._appwell.app.get_n_windows() === 0) { icon._clickJump = 1.0; this._startAnimation(); if (this.dashContainer?._animateIn) this.dashContainer._animateIn(0.2, 0); }
           });
           icon._appwell.connect('notify::urgent', () => {
-            if (icon._appwell.urgent && !(icon._attentionJump > 0)) { icon._attentionJump = 1.0; icon._attentionCooldown = 0; this._startAnimation(); if (this.dashContainer?._animateIn) this.dashContainer._animateIn(0.2, 0); }
+            if (icon._appwell.urgent) {
+              this.requestUrgentBounce(icon._appwell, true);
+              if (this.extension?.urgent_bounce && this.dashContainer?._animateIn) this.dashContainer._animateIn(0.2, 0);
+            } else {
+              this.clearUrgentBounce(icon._appwell);
+            }
           });
         }
       }
@@ -250,24 +317,34 @@ let pos = this._get_position(icon._bin);
         }
         didAnimate = true;
       }
-      if (icon._attentionJump > 0) {
+      const urgentBounceEnabled = this.extension?.urgent_bounce !== false;
+      if (!urgentBounceEnabled) {
+        if (icon._appwell) icon._appwell._dashAnimatorUrgentBounceActive = false;
+        icon._attentionJump = 0;
+        icon._attentionCooldown = 0;
+      }
+
+      if (urgentBounceEnabled && icon._attentionJump > 0) {
         let jh = this.extension.jump_height || 0.85;
         let off = Math.sin(icon._attentionJump * Math.PI) * iconSize * ANIM_ICON_RAISE * scaleFactor * 1.65 * jh;
         if (dock_position === 'bottom') jY = -off; else if (dock_position === 'top') jY = off; else if (dock_position === 'left') jX = off; else if (dock_position === 'right') jX = -off;
         icon._attentionJump -= 0.0275 * (this.extension.jump_speed || 1.0);
         if (icon._attentionJump <= 0) {
           icon._attentionJump = 0;
+          if (icon._appwell?._dashAnimatorUrgentFirstRunRemaining > 0) {
+            icon._appwell._dashAnimatorUrgentFirstRunRemaining--;
+          }
           // If still urgent — start the 1s quiet gap before next bounce cycle
-          if (icon._appwell?.urgent) {
+          if (icon._appwell?.urgent && icon._appwell._dashAnimatorUrgentBounceActive !== false) {
             icon._attentionCooldown = Math.round(1000 / this.animationInterval);
           }
         }
         didAnimate = true;
-      } else if (icon._appwell?.urgent) {
+      } else if (urgentBounceEnabled && !(this.extension?._isHidden) && icon._appwell?.urgent && icon._appwell._dashAnimatorUrgentBounceActive !== false) {
         if (icon._attentionCooldown > 0) {
           icon._attentionCooldown--;
           didAnimate = true;
-        } else {
+        } else if (!this.extension?._pendingHideForUrgentBounce || icon._appwell._dashAnimatorUrgentFirstRunRemaining > 0) {
           // Quiet gap expired — fire next bounce cycle
           icon._attentionJump = 1.0;
           didAnimate = true;

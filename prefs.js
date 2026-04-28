@@ -67,6 +67,13 @@ export default class DashAnimatorPreferences extends ExtensionPreferences {
         const jumpSpeedRow = buildScaleRow('jump-speed', 'Bounce Speed', 'Speed multiplier for the bounce animation', 0.5, 0.8, 0.1);
         jumpGroup.add(jumpSpeedRow);
 
+        const urgentBounceRow = new Adw.SwitchRow({
+            title: 'Urgent Bounce',
+            subtitle: 'Bounce dock icons when applications request attention. Recommended to turn off "Wiggle Urgent Applications" in Dash to Dock when enabled.',
+        });
+        settings.bind('urgent-bounce', urgentBounceRow, 'active', 0);
+        jumpGroup.add(urgentBounceRow);
+
         window.add(animPage);
 
         // ── Theme page ────────────────────────────────────────────────────────

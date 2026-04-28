@@ -226,6 +226,7 @@ export default class DashAnimatorExtension extends Extension {
   _applySettings() {
     this.jump_height = this._settings.get_double('jump-height');
     this.jump_speed = this._settings.get_double('jump-speed');
+    this.urgent_bounce = this._settings.get_boolean('urgent-bounce');
   }
 
   _findChildByName(actor, name) {
@@ -295,11 +296,14 @@ export default class DashAnimatorExtension extends Extension {
         this._jumpHideTimer = null;
       }
       this._isHidden = false;
+      this._pendingHideForUrgentBounce = false;
+      if (this.animator) this.animator.resumeUrgentBounce();
       this._startAnimation();
       this.dashContainer.__animateIn(time, delay);
     };
 this.dashContainer._animateOut = (time, delay) => {
   if (this.animator && this.animator.isJumping()) {
+    this._pendingHideForUrgentBounce = true;
     this.dashContainer.__animateIn(0.2, 0);
     if (this._jumpHideTimer) clearInterval(this._jumpHideTimer);
     this._jumpHideTimer = setInterval(() => {
@@ -308,6 +312,8 @@ this.dashContainer._animateOut = (time, delay) => {
         this._jumpHideTimer = null;
         if (!this._isHidden) {
           this._isHidden = true;
+          this._pendingHideForUrgentBounce = false;
+          if (this.animator) this.animator.pauseUrgentBounce();
           this.dashContainer.__animateOut(time, delay);
         }
       }
@@ -315,6 +321,8 @@ this.dashContainer._animateOut = (time, delay) => {
     return;
   }
   this._isHidden = true;
+  this._pendingHideForUrgentBounce = false;
+  if (this.animator) this.animator.pauseUrgentBounce();
   this.dashContainer.__animateOut(time, delay);
 };
 
@@ -371,12 +379,12 @@ this.dashContainer._animateOut = (time, delay) => {
       if (appIcon && !appIcon._dashAnimatorUrgentHooked) {
         appIcon._dashAnimatorUrgentHooked = true;
         appIcon.connect('notify::urgent', () => {
-          if (appIcon.urgent && !(c._attentionJump > 0)) {
-            c._attentionCooldown = 0;
-            c._attentionJump = 1.0;
-            if (this.animator) this.animator._startAnimation();
+          if (this.urgent_bounce && appIcon.urgent) {
+            if (this.animator) this.animator.requestUrgentBounce(appwell, true);
             if (this.dashContainer && this.dashContainer._animateIn)
               this.dashContainer._animateIn(0.2, 0);
+          } else {
+            if (this.animator) this.animator.clearUrgentBounce(appwell);
           }
         });
       }

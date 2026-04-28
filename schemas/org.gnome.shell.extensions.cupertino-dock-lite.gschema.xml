@@ -11,6 +11,11 @@
       <summary>Jump Speed</summary>
       <description>The speed of the icon jump animation.</description>
     </key>
+    <key name="urgent-bounce" type="b">
+      <default>true</default>
+      <summary>Urgent Bounce</summary>
+      <description>Bounce dock icons when applications request attention. Recommended to turn off "Wiggle Urgent Applications" in Dash to Dock when enabled.</description>
+    </key>
     <key name="override-theming" type="b">
       <default>false</default>
       <summary>Override Dock Theming</summary>
