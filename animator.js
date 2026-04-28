@@ -58,6 +58,7 @@ Main.uiGroup.add_child(this._iconsContainer);
     this._enabled = false;
     this._endAnimation();
     if (this._oneShotId) { clearInterval(this._oneShotId); this._oneShotId = null; }
+    this._resetAppwellHooks();
     if (this._iconsContainer) {
 Main.uiGroup.remove_child(this._iconsContainer);
       this._iconsContainer.destroy();
@@ -76,7 +77,7 @@ Main.uiGroup.remove_child(this._dotsContainer);
     if (!this._enabled) return;
     if (this._iconsContainer) {
       this._iconsContainer.get_children().forEach(c => {
-        if (c._appwell) c._appwell._dashAnimatorHooked = false;
+        this._disconnectAppwellHooks(c._appwell);
         c.destroy();
       });
     }
@@ -247,7 +248,10 @@ Main.uiGroup.remove_child(this._dotsContainer);
     animateIcons.forEach((c) => {
       let orphan = true;
       for (let i = 0; i < icons.length; i++) { if (icons[i]._bin == c._bin) { orphan = false; break; } }
-      if (orphan) this._iconsContainer.remove_child(c);
+      if (orphan) {
+        this._disconnectAppwellHooks(c._appwell);
+        this._iconsContainer.remove_child(c);
+      }
     });
 
     animateIcons = this._iconsContainer.get_children().filter(c => c.name !== 'cupertinisator-badge');
@@ -271,10 +275,10 @@ Main.uiGroup.remove_child(this._dotsContainer);
         if (this._badgeManager) this._badgeManager.attachToIcon(icon);
         if (icon._appwell && !icon._appwell._dashAnimatorHooked) {
           icon._appwell._dashAnimatorHooked = true;
-          icon._appwell.connect('clicked', () => {
+          icon._appwell._dashAnimatorClickedId = icon._appwell.connect('clicked', () => {
             if (icon._appwell.app && icon._appwell.app.get_n_windows() === 0) { icon._clickJump = 1.0; this._startAnimation(); if (this.dashContainer?._animateIn) this.dashContainer._animateIn(0.2, 0); }
           });
-          icon._appwell.connect('notify::urgent', () => {
+          icon._appwell._dashAnimatorUrgentId = icon._appwell.connect('notify::urgent', () => {
             if (icon._appwell.urgent) {
               this.requestUrgentBounce(icon._appwell, true);
               if (this.extension?.urgent_bounce && this.dashContainer?._animateIn) this.dashContainer._animateIn(0.2, 0);
@@ -443,6 +447,29 @@ let pos = this._get_position(icon._bin);
       }
     });
     if (this.dash?._box) { this.dash._box.get_children().forEach(c => { if (c.first_child) c.first_child.opacity = 255; }); }
+  }
+
+  _resetAppwellHooks() {
+    if (!this._iconsContainer) return;
+    this._iconsContainer.get_children().forEach(icon => {
+      this._disconnectAppwellHooks(icon._appwell);
+    });
+  }
+
+  _disconnectAppwellHooks(appwell) {
+    if (!appwell) return;
+
+    if (appwell._dashAnimatorClickedId) {
+      try { appwell.disconnect(appwell._dashAnimatorClickedId); } catch (e) { }
+      appwell._dashAnimatorClickedId = null;
+    }
+
+    if (appwell._dashAnimatorUrgentId) {
+      try { appwell.disconnect(appwell._dashAnimatorUrgentId); } catch (e) { }
+      appwell._dashAnimatorUrgentId = null;
+    }
+
+    appwell._dashAnimatorHooked = false;
   }
 
   _getD2dBadgeBin(appwell) {

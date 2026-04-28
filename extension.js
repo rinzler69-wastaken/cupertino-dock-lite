@@ -21,6 +21,8 @@
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import St from 'gi://St';
+import * as AppFavorites from 'resource:///org/gnome/shell/ui/appFavorites.js';
+import * as DND from 'resource:///org/gnome/shell/ui/dnd.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
@@ -184,6 +186,7 @@ export default class DashAnimatorExtension extends Extension {
     }
 
     if (this.dash) {
+      this._unpatchTrashUnpinDrop();
       this.dashEvents.forEach(id => {
         if (this.dash) this.dash.disconnect(id);
       });
@@ -265,6 +268,7 @@ export default class DashAnimatorExtension extends Extension {
 
 
     this.dash = this._findChildByName(this.dashContainer, 'dash');
+    this._patchTrashUnpinDrop();
     this.dashEvents = [];
     this.dashEvents.push(
       this.dash.connect('icon-size-changed', this._startAnimation.bind(this))
@@ -416,6 +420,81 @@ this.dashContainer._animateOut = (time, delay) => {
 
     this.dashContainer._icons = icons;
     return icons;
+  }
+
+  _patchTrashUnpinDrop() {
+    if (!this.dash || this.dash._cupertinoTrashUnpinPatched) return;
+
+    const originalHandleDragOver = this.dash.handleDragOver?.bind(this.dash);
+    const originalAcceptDrop = this.dash.acceptDrop?.bind(this.dash);
+
+    this.dash._cupertinoTrashUnpinPatched = {
+      handleDragOver: this.dash.handleDragOver,
+      acceptDrop: this.dash.acceptDrop,
+    };
+
+    this.dash.handleDragOver = (source, actor, x, y, time) => {
+      if (this._canUnpinDraggedFavoriteOnTrash(source) && this._isPointerOverTrash()) {
+        return DND.DragMotionResult.MOVE_DROP;
+      }
+
+      return originalHandleDragOver?.(source, actor, x, y, time) ?? DND.DragMotionResult.CONTINUE;
+    };
+
+    this.dash.acceptDrop = (source, actor, x, y, time) => {
+      if (this._canUnpinDraggedFavoriteOnTrash(source) && this._isPointerOverTrash()) {
+        const app = this._getDraggedApp(source);
+        AppFavorites.getAppFavorites().removeFavorite(app.get_id());
+        return true;
+      }
+
+      return originalAcceptDrop?.(source, actor, x, y, time) ?? false;
+    };
+  }
+
+  _unpatchTrashUnpinDrop() {
+    if (!this.dash?._cupertinoTrashUnpinPatched) return;
+
+    const patch = this.dash._cupertinoTrashUnpinPatched;
+    this.dash.handleDragOver = patch.handleDragOver;
+    this.dash.acceptDrop = patch.acceptDrop;
+    this.dash._cupertinoTrashUnpinPatched = null;
+  }
+
+  _canUnpinDraggedFavoriteOnTrash(source) {
+    const app = this._getDraggedApp(source);
+    if (!app?.get_id || app.isTrash) return false;
+
+    const appId = app.get_id();
+    return global.settings.is_writable('favorite-apps') &&
+      AppFavorites.getAppFavorites().isFavorite(appId);
+  }
+
+  _getDraggedApp(source) {
+    return source?.app ?? source?._delegate?.app ?? source?.child?._delegate?.app ?? null;
+  }
+
+  _isPointerOverTrash() {
+    const trashActor = this._getTrashActor();
+    if (!trashActor) return false;
+
+    const [pointerX, pointerY] = global.get_pointer();
+    const [trashX, trashY] = trashActor.get_transformed_position();
+    const [trashWidth, trashHeight] = trashActor.get_transformed_size();
+
+    return pointerX >= trashX &&
+      pointerX <= trashX + trashWidth &&
+      pointerY >= trashY &&
+      pointerY <= trashY + trashHeight;
+  }
+
+  _getTrashActor() {
+    try {
+      const children = this.dash?._box?.get_children?.() ?? [];
+      return children.find(actor => actor.child?._delegate?.app?.isTrash) ?? null;
+    } catch (e) {
+      return null;
+    }
   }
 
   _beginAnimation() {
