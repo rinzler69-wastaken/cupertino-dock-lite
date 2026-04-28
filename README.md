@@ -1,6 +1,6 @@
 # WACK – Cupertino Lite Dock
 
-- A stripped down, and currently maintained lightweight fork, of **[Dash Cupertinisator](github.com/rinzler69-wastaken/dash-cupertinisator)**.
+A stripped down, and currently maintained lightweight fork, of **[Dash Cupertinisator](github.com/rinzler69-wastaken/dash-cupertinisator)**.
 
 <p align="center">
   <img src="screenshots/screenshot1.png" width="48%" />
