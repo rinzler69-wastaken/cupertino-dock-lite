@@ -252,6 +252,14 @@ Main.uiGroup.remove_child(this._iconsContainer);
       //Refreshes bounce clone sizes in case user resizes icons in D2D
       if (icon.first_child) {
         icon.first_child.set_icon_size(iconSize * ANIM_ICON_QUALITY);
+        // Sync icon in case it changed (e.g. trash fill/empty state)
+        const src = icon._bin?.first_child;
+        if (src) {
+          if (src.gicon && icon.first_child.gicon !== src.gicon)
+            icon.first_child.gicon = src.gicon;
+          else if (src.icon_name && icon.first_child.icon_name !== src.icon_name)
+            icon.first_child.icon_name = src.icon_name;
+        }
       }
 
     });
