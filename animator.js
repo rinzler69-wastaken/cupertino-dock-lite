@@ -14,7 +14,7 @@ const ANIM_ICON_QUALITY = 2.0;
 const ANIM_REENABLE_DELAY = 750;
 const ANIM_ICON_RAISE = 0.75;
 
-const DOT_CANVAS_SIZE = 96;
+// const DOT_CANVAS_SIZE = 96;
 
 export class Animator {
   constructor() {
@@ -33,19 +33,11 @@ export class Animator {
 
 Main.uiGroup.add_child(this._iconsContainer);
 
-    this._dotsContainer = new St.Widget({
-      name: 'dotsContainer',
-      reactive: false,
-      can_focus: false
-    });
-
-    Main.uiGroup.add_child(this._dotsContainer);
-
     this._enabled = true;
     this._dragging = false;
     this._oneShotId = null;
     this._relayout = 8;
-    this.show_dots = true;
+
     this._badgeManager = new BadgeManager();
     this._badgeManager.onRebuild = () => {
       // Wake the loop so updateIcon() can refresh clone badge geometry/counts.
@@ -63,12 +55,8 @@ Main.uiGroup.add_child(this._iconsContainer);
 Main.uiGroup.remove_child(this._iconsContainer);
       this._iconsContainer.destroy();
       this._iconsContainer = null;
-Main.uiGroup.remove_child(this._dotsContainer);
-      this._dotsContainer.destroy();
-      this._dotsContainer = null;
     }
     if (this._badgeManager) { this._badgeManager.destroy(); this._badgeManager = null; }
-    this._dots = [];
     if (this._separator) { this._separator.destroy(); this._separator = null; }
     if (this.dashContainer) this._restoreIcons();
   }
@@ -81,22 +69,16 @@ Main.uiGroup.remove_child(this._dotsContainer);
         c.destroy();
       });
     }
-    if (this._dotsContainer) {
-      this._dotsContainer.destroy_all_children();
-      this._dots = [];
-    }
     this._iconsCount = 0;
     this._startAnimation();
   }
 
   showAll() {
     if (this._iconsContainer) this._iconsContainer.visible = true;
-    if (this._dotsContainer) this._dotsContainer.visible = true;
   }
 
   hideAll() {
     if (this._iconsContainer) this._iconsContainer.visible = false;
-    if (this._dotsContainer) this._dotsContainer.visible = false;
   }
 
   isJumping() {
@@ -173,22 +155,6 @@ Main.uiGroup.remove_child(this._dotsContainer);
     return this._iconsContainer.get_children().find(icon => icon._appwell === appwell) ?? null;
   }
 
-
-
-
-  _precreate_dots(count) {
-    if (!this._dots) this._dots = [];
-    if (this.show_dots && this.extension.xDot) {
-      for (let i = 0; i < count - this._dots.length; i++) {
-        let dot = new this.extension.xDot(DOT_CANVAS_SIZE);
-        this._dots.push(dot);
-        this._dotsContainer.add_child(dot);
-        dot.set_position(0, 0);
-      }
-    }
-    this._dots.forEach(d => { d.visible = false; });
-  }
-
   _animate() {
     if (!this._iconsContainer || !this.dashContainer) return;
     this.dash = this.dashContainer.dash;
@@ -197,7 +163,6 @@ Main.uiGroup.remove_child(this._dotsContainer);
       this._relayout--;
     }
     this._iconsContainer.width = 1; this._iconsContainer.height = 1;
-    this._dotsContainer.width = 1; this._dotsContainer.height = 1;
 
     let jumping = this.isJumping();
 
@@ -219,13 +184,12 @@ Main.uiGroup.remove_child(this._dotsContainer);
       case 3: dock_position = 'left'; pivot.x = 0.0; pivot.y = 0.5; break;
     }
 
-    let visible_dots = 0;
     let icons = this._findIcons();
 
     icons.forEach((c) => {
       let bin = c._bin;
       if (!bin) return;
-      if (c._appwell && c._appwell.app && c._appwell.app.get_n_windows() > 0) visible_dots++;
+      if (c._appwell && c._appwell.app && c._appwell.app.get_n_windows() > 0);
       let found = false;
       for (let i = 0; i < animateIcons.length; i++) {
         if (animateIcons[i]._bin == bin) { found = true; break; }
@@ -241,9 +205,6 @@ Main.uiGroup.remove_child(this._dotsContainer);
         }
       }
     });
-
-    this._precreate_dots(visible_dots);
-
 
     animateIcons.forEach((c) => {
       let orphan = true;
@@ -287,6 +248,10 @@ Main.uiGroup.remove_child(this._dotsContainer);
             }
           });
         }
+      }
+      //Refreshes bounce clone sizes in case user resizes icons in D2D
+      if (icon.first_child) {
+        icon.first_child.set_icon_size(iconSize * ANIM_ICON_QUALITY);
       }
 
     });
@@ -367,18 +332,6 @@ let pos = this._get_position(icon._bin);
       icon.visible = cloneActive;
 
       icon.set_position(Math.round(pos[0] + jX), Math.round(pos[1] + jY));
-
-      if (this.show_dots && icon._appwell?.app?.get_n_windows() > 0) {
-        let dot = this._dots[dotIndex++];
-        if (dot) {
-          dot.visible = true;
-          let cx = pos[0] + jX + (iconSize) / 2; let cy = pos[1] + jY + (iconSize) / 2;
-          let dy = 0;
-          if (dock_position === 'bottom') dy = (iconSize) / 2 + 6 * scaleFactor;
-          else if (dock_position === 'top') dy = -(iconSize) / 2 - 6 * scaleFactor;
-          dot.set_position(Math.round(cx - 12 * scaleFactor), Math.round(cy + dy - 12 * scaleFactor));
-        }
-      }
       if (this._badgeManager) this._badgeManager.updateIcon(icon, iconSize, badgeCount, cloneActive);
     });
     if (didAnimate) this._startAnimation();
@@ -415,25 +368,11 @@ let pos = this._get_position(icon._bin);
     });
   }
 
-
-  // _onFocusWindow() { this._relayout = 8; if (!this._intervalId) this._startAnimation(); }
-
-  // _onFullScreen() {
-  //   if (!this._iconsContainer) return;
-  //   if (!this._isInFullscreen()) { this._iconsContainer.show(); this._dotsContainer.show(); }
-  //   else { this._iconsContainer.hide(); this._dotsContainer.hide(); }
-  // }
-
-  // _isInFullscreen() {
-  //   let m = this.dashContainer.monitor || this.dashContainer._monitor;
-  //   return m ? m.inFullscreen : false;
-  // }
-
   _startAnimation() { this._beginAnimation(); }
 
   _restoreIcons() {
     this._findIcons().forEach(c => {
-      if (!c || !c._bin) return; // Safety check
+      if (!c || !c._bin) return;
       if (c._icon) c._icon.opacity = 255;
       if (c._bin?.first_child) c._bin.first_child.opacity = 255;
       this._setD2dBadgeOpacity(c._appwell, 255);
