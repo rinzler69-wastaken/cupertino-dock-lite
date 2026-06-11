@@ -19,21 +19,21 @@
 
 import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
-import Clutter from 'gi://Clutter';
 import St from 'gi://St';
 import * as AppFavorites from 'resource:///org/gnome/shell/ui/appFavorites.js';
 import * as DND from 'resource:///org/gnome/shell/ui/dnd.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
-import { Bouncer } from './bouncer.js';
-import { Magnifier } from './magnifier.js';
+import { Animator } from './animator.js';
 
 export default class CupertinoDockExtension extends Extension {
   enable() {
     this._settings = this.getSettings();
-    this.animator = null;
     this._applySettings();
     this._settings.connectObject('changed', () => this._applySettings(), this);
+
+    this.animator = new Animator();
+    this.animator.extension = this;
 
     if (!this._findDashContainer()) {
       this._findDashIntervalId = setInterval(() => {
@@ -49,8 +49,7 @@ export default class CupertinoDockExtension extends Extension {
       this
     );
 
-    if (this.animator)
-      this.animator.enable();
+    this.animator.enable();
     this._connectThemeSettings();
   }
 
@@ -66,11 +65,6 @@ export default class CupertinoDockExtension extends Extension {
     if (this._oneShotId) {
       clearTimeout(this._oneShotId);
       this._oneShotId = null;
-    }
-
-    if (this._magnifierResetTimeoutId) {
-      GLib.source_remove(this._magnifierResetTimeoutId);
-      this._magnifierResetTimeoutId = null;
     }
 
     this._pendingHide = null;
@@ -124,13 +118,6 @@ export default class CupertinoDockExtension extends Extension {
       if (this.dash._box) {
         this.dash._box.disconnectObject(this);
       }
-      if (this._origVfuncGetPreferredHeight) {
-        const lm = this.dash._box.layout_manager;
-        if (lm && lm.constructor && lm.constructor.name === 'DockDashIconsVerticalLayout') {
-          lm.constructor.prototype.vfunc_get_preferred_height = this._origVfuncGetPreferredHeight;
-        }
-        this._origVfuncGetPreferredHeight = null;
-      }
     }
   }
 
@@ -142,40 +129,6 @@ export default class CupertinoDockExtension extends Extension {
 
   _applySettings() {
     this.urgent_bounce = this._settings.get_boolean('urgent-bounce');
-    this.enable_magnification = this._settings.get_boolean('enable-magnification');
-    this.animation_magnify = this._settings.get_double('animation-magnify');
-    this.animation_spread = this._settings.get_double('animation-spread');
-    this.animation_rise = this._settings.get_double('animation-rise');
-
-    this._updateAnimatorClass();
-  }
-
-  _updateAnimatorClass() {
-    const enableMag = this._settings.get_boolean('enable-magnification');
-    const targetClass = enableMag ? Magnifier : Bouncer;
-
-    if (this.animator && this.animator.constructor === targetClass) {
-      return;
-    }
-
-    const oldAnimator = this.animator;
-    const dashContainer = oldAnimator ? oldAnimator.dashContainer : null;
-
-    if (oldAnimator) {
-      oldAnimator.disable();
-    }
-
-    this.animator = new targetClass();
-    this.animator.extension = this;
-    if (dashContainer) {
-      this.animator.dashContainer = dashContainer;
-    }
-
-    if (oldAnimator) {
-      this.animator.enable();
-      this._iconsDirty = true;
-      this._startAnimation();
-    }
   }
 
   _findChildByName(actor, name, maxDepth = 4, currentDepth = 0) {
@@ -213,15 +166,6 @@ export default class CupertinoDockExtension extends Extension {
     this._disconnectDashEvents();
     this._disconnectIconEvents();
     this.dash = this._findChildByName(this.dashContainer, 'dash');
-    if (this.dash && this.dash._box && (this.dashContainer._position === 1 || this.dashContainer._position === 3)) {
-      const lm = this.dash._box.layout_manager;
-      if (lm && lm.constructor && lm.constructor.name === 'DockDashIconsVerticalLayout') {
-        this._origVfuncGetPreferredHeight = lm.constructor.prototype.vfunc_get_preferred_height;
-        lm.constructor.prototype.vfunc_get_preferred_height = function(container, forWidth) {
-          return Clutter.BoxLayout.prototype.vfunc_get_preferred_height.call(this, container, forWidth);
-        };
-      }
-    }
     this._patchTrashUnpinDrop();
     this._iconsDirty = true;
 
@@ -267,10 +211,6 @@ export default class CupertinoDockExtension extends Extension {
       // Cancel any pending deferred hide — user showed the dock again
       this._pendingHide = null;
       this._isHidden = false;
-      if (this._magnifierResetTimeoutId) {
-        GLib.source_remove(this._magnifierResetTimeoutId);
-        this._magnifierResetTimeoutId = null;
-      }
       // Resume urgent bounce if the matter is still unattended
       if (this.animator) this.animator.resumeUrgentBounce();
       this._startAnimation();
@@ -290,15 +230,6 @@ export default class CupertinoDockExtension extends Extension {
       }
       this._isHidden = true;
       this._pendingHide = null;
-      if (this._magnifierResetTimeoutId) {
-        GLib.source_remove(this._magnifierResetTimeoutId);
-        this._magnifierResetTimeoutId = null;
-      }
-      this._magnifierResetTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, (time + delay) * 1000 + 50, () => {
-        this._magnifierResetTimeoutId = null;
-        this.animator?.resetMagnifier?.();
-        return GLib.SOURCE_REMOVE;
-      });
       this.dashContainer.__animateOut(time, delay);
     };
 

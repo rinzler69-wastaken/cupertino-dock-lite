@@ -1,0 +1,21 @@
+{
+  "description": "A lightweight Cupertino animation and theming layer for Dash to Dock. Part of the WACK project.",
+  "name": "WACK - Cupertino Dock Lite",
+  "shell-version": [
+    "46",
+    "47",
+    "48",
+    "49",
+    "50"
+  ],
+  "url": "https://github.com/rinzler69-wastaken/cupertino-dock-lite",
+  "uuid": "cupertino-dock-lite@rinzler69-wastaken.github.com",
+  "gettext-domain": "cupertino-dock-lite",
+  "settings-schema": "org.gnome.shell.extensions.cupertino-dock-lite",
+  "version-name": "1.0.0",
+  "donations": {
+    "paypal": "ArtFazil",
+    "kofi": "mikerinzler69",
+    "custom": "https://saweria.co/rinzler69"
+  }
+}

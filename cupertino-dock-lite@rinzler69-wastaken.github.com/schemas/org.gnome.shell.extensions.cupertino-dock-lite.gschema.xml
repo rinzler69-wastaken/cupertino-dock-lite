@@ -36,30 +36,10 @@
       <summary>Show Unread Count Number</summary>
       <description>Show the physical number of unread notifications inside the badge.</description>
     </key>
-    <key name="always-hide" type="b">
-      <default>false</default>
-      <summary>Always Hide Dock</summary>
-      <description>Keep the dock permanently hidden. It only appears in the GNOME overview.</description>
-    </key>
-    <key name="enable-magnification" type="b">
-      <default>true</default>
-      <summary>Enable Magnification</summary>
-      <description>Whether to magnify icons on hover.</description>
-    </key>
-    <key name="animation-magnify" type="d">
-      <default>0.5</default>
-      <summary>Animation Magnification</summary>
-      <description>The scale multiplier to magnify icons during hovering.</description>
-    </key>
-    <key name="animation-spread" type="d">
-      <default>0.6</default>
-      <summary>Animation Spread</summary>
-      <description>How much adjacent icons spread apart when hovered.</description>
-    </key>
-    <key name="animation-rise" type="d">
-      <default>0.2</default>
-      <summary>Animation Rise</summary>
-      <description>How high the hovered icons rise above the baseline.</description>
-    </key>
+<key name="always-hide" type="b">
+  <default>false</default>
+  <summary>Always Hide Dock</summary>
+  <description>Keep the dock permanently hidden. It only appears in the GNOME overview.</description>
+</key>
   </schema>
 </schemalist>

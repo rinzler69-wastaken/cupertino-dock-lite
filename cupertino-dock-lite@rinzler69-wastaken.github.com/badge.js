@@ -1,5 +1,5 @@
+// badge.js — clone badge renderer, delegates count to D2D's notificationsMonitor
 import Clutter from 'gi://Clutter';
-import { isActorAlive } from './bouncer.js';
 
 export class BadgeManager {
   constructor() {
@@ -75,22 +75,10 @@ export class BadgeManager {
     badge.visible = shouldShow;
   }
 
-  _useFallbackPosition(uiIcon, badge, iconSize) {
-    const fallback = Math.round(Math.max(16, iconSize * 0.42));
-    badge.source = null;
-    badge.set_size(fallback, fallback);
-    badge.set_scale(1, 1);
-    badge.x = Math.round(uiIcon.width - fallback * 0.72);
-    badge.y = Math.round(-fallback * 0.28);
-    badge._cachedOffsetReady = true;
-    badge._lastIconSize = iconSize;
-    badge._lastBadgeSize = [fallback, fallback];
-  }
-
   _positionLikeD2d(uiIcon, badge, iconSize) {
     const d2dBadge = this._getD2dBadgeActor(uiIcon._appwell);
     const badgeBin = this._getD2dBadgeBin(uiIcon._appwell);
-    if (isActorAlive(d2dBadge) && isActorAlive(uiIcon._bin)) {
+    if (d2dBadge && uiIcon._bin) {
       const badgeSize = this._getTransformedSize(d2dBadge) || [0, 0];
       const lastBadgeSize = badge._lastBadgeSize || [0, 0];
 
@@ -100,15 +88,6 @@ export class BadgeManager {
                           lastBadgeSize[1] !== badgeSize[1];
 
       if (needsUpdate) {
-        // Safety check: ensure actors are fully mapped, allocated, and on stage before caching coordinates.
-        // If not mapped or not on stage, skip updating the cache and keep existing or use fallback.
-        if (!d2dBadge.get_stage() || !uiIcon._bin.get_stage() || !d2dBadge.mapped || !uiIcon._bin.mapped) {
-          if (!badge._cachedOffsetReady) {
-            this._useFallbackPosition(uiIcon, badge, iconSize);
-          }
-          return;
-        }
-
         const oldTx = badgeBin ? badgeBin.translation_x : 0;
         if (badgeBin) badgeBin.translation_x = 0;
 
@@ -116,14 +95,6 @@ export class BadgeManager {
         const iconPos = uiIcon._bin.get_transformed_position();
 
         if (badgeBin) badgeBin.translation_x = oldTx;
-
-        // Skip caching if transformed position returns unallocated [0, 0] stage coordinates.
-        if ((badgePos[0] === 0 && badgePos[1] === 0) || (iconPos[0] === 0 && iconPos[1] === 0)) {
-          if (!badge._cachedOffsetReady) {
-            this._useFallbackPosition(uiIcon, badge, iconSize);
-          }
-          return;
-        }
 
         badge._cachedX = Math.round(badgePos[0] - iconPos[0]);
         badge._cachedY = Math.round(badgePos[1] - iconPos[1]);
@@ -144,7 +115,17 @@ export class BadgeManager {
       return;
     }
 
-    this._useFallbackPosition(uiIcon, badge, iconSize);
+    const fallback = Math.round(Math.max(16, iconSize * 0.42));
+    if (!badge._cachedOffsetReady || badge._lastIconSize !== iconSize || badge.source !== null) {
+      badge.source = null;
+      badge.set_size(fallback, fallback);
+      badge.set_scale(1, 1);
+      badge.x = Math.round(uiIcon.width - fallback * 0.72);
+      badge.y = Math.round(-fallback * 0.28);
+      badge._cachedOffsetReady = true;
+      badge._lastIconSize = iconSize;
+      badge._lastBadgeSize = [fallback, fallback];
+    }
   }
 
   _getTransformedSize(actor) {
@@ -166,16 +147,9 @@ export class BadgeManager {
   }
 
   _getD2dBadgeBin(appwell) {
-    if (!appwell || !isActorAlive(appwell)) return null;
-    const container = appwell._iconContainer;
-    if (!container || !isActorAlive(container)) return null;
-    if (container._notificationBadgeBin) {
-      if (!isActorAlive(container._notificationBadgeBin)) {
-        container._notificationBadgeBin = null;
-      } else {
-        return container._notificationBadgeBin;
-      }
-    }
+    const container = appwell?._iconContainer;
+    if (!container) return null;
+    if (container._notificationBadgeBin) return container._notificationBadgeBin;
 
     const children = container.get_children();
     const badgeBin = children.find(child => {

@@ -2,7 +2,7 @@ UUID = $(shell python3 -c "import json; print(json.load(open('metadata.json'))['
 
 EXTENSION_DIR = ~/.local/share/gnome-shell/extensions/$(UUID)
 
-JS_FILES = extension.js animator.js prefs.js badge.js
+JS_FILES = extension.js magnifier.js bouncer.js prefs.js badge.js tooltip.js
 
 .PHONY: all build install uninstall pack lint pretty
 

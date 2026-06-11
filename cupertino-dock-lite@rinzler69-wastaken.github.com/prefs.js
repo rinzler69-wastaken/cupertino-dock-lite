@@ -222,61 +222,6 @@ export default class CupertinoDockPreferences extends ExtensionPreferences {
         bounceGroup.add(urgentBounceRow);
         configPage.add(bounceGroup);
 
-        // ── Magnification group ────────────────────────────────────────────────
-        const magGroup = new Adw.PreferencesGroup({
-            title: 'Icon Magnification',
-            description: 'Configure how dock icons magnify and spread on hover.',
-        });
-        configPage.add(magGroup);
-
-        const magToggleRow = new Adw.SwitchRow({
-            title: 'Enable Magnification',
-            subtitle: 'Zoom dock icons when hovered. Only supported on top/bottom docks — left/right is coming soon.',
-        });
-        settings.bind('enable-magnification', magToggleRow, 'active', 0);
-        magGroup.add(magToggleRow);
-
-        const resetMagBtn = new Gtk.Button({
-            icon_name: 'view-refresh-symbolic',
-            tooltip_text: 'Reset magnification settings to defaults',
-            css_classes: ['flat'],
-            valign: Gtk.Align.CENTER,
-        });
-        resetMagBtn.connect('clicked', () => {
-            settings.set_double('animation-magnify', 0.5);
-        });
-        magToggleRow.add_suffix(resetMagBtn);
-
-        const buildScaleRow = (key, title, subtitle, lower, upper, step) => {
-            const row = new Adw.ActionRow({ title, subtitle });
-            const scale = new Gtk.Scale({
-                orientation: Gtk.Orientation.HORIZONTAL,
-                adjustment: new Gtk.Adjustment({ lower, upper, step_increment: step }),
-                digits: 2,
-                draw_value: true,
-                value_pos: Gtk.PositionType.RIGHT,
-                valign: Gtk.Align.CENTER,
-            });
-            scale.set_size_request(200, -1);
-
-            settings.bind(key, scale.adjustment, 'value', 0);
-            row.add_suffix(scale);
-            row.activatable_widget = scale;
-            return row;
-        };
-
-        const magnifyRow = buildScaleRow('animation-magnify', 'Magnification Scale', 'Multiplier for how large the icon zooms', 0.1, 1.5, 0.1);
-        magGroup.add(magnifyRow);
-
-        const updateMagSensitivity = () => {
-            const active = settings.get_boolean('enable-magnification');
-            magnifyRow.sensitive = active;
-            resetMagBtn.sensitive = active;
-        };
-        updateMagSensitivity();
-        const magSettingId = settings.connect('changed::enable-magnification', updateMagSensitivity);
-
-
         // ── Dock theme group ──────────────────────────────────────────────────
         const themeGroup = new Adw.PreferencesGroup({
             title: 'Dock Theme',
@@ -347,7 +292,6 @@ export default class CupertinoDockPreferences extends ExtensionPreferences {
         window.connect('destroy', () => {
             settings.disconnect(awareId);
             settings.disconnect(overrideId);
-            settings.disconnect(magSettingId);
         });
 
         window.add(configPage);
