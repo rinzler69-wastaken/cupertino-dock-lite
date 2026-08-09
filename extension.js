@@ -16,21 +16,21 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
-
-import Gio from 'gi://Gio';
-import GLib from 'gi://GLib';
-import St from 'gi://St';
-import * as AppFavorites from 'resource:///org/gnome/shell/ui/appFavorites.js';
-import * as DND from 'resource:///org/gnome/shell/ui/dnd.js';
-import * as Main from 'resource:///org/gnome/shell/ui/main.js';
-import { Extension } from 'resource:///org/gnome/shell/extensions/extension.js';
-import { Animator } from './animator.js';
+import Gio from "gi://Gio";
+import GLib from "gi://GLib";
+import St from "gi://St";
+import * as AppFavorites from "resource:///org/gnome/shell/ui/appFavorites.js";
+import * as DND from "resource:///org/gnome/shell/ui/dnd.js";
+import * as Main from "resource:///org/gnome/shell/ui/main.js";
+import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
+import { Animator } from "./animator.js";
 
 export default class DashAnimatorExtension extends Extension {
   enable() {
+    this._disabled = false;
     this._settings = this.getSettings();
     this._applySettings();
-    this._settings.connectObject('changed', () => this._applySettings(), this);
+    this._settings.connectObject("changed", () => this._applySettings(), this);
 
     this.animator = new Animator();
     this.animator.extension = this;
@@ -45,8 +45,9 @@ export default class DashAnimatorExtension extends Extension {
     }
 
     global.display.connectObject(
-      'in-fullscreen-changed', () => this._onFullScreen(),
-      this
+      "in-fullscreen-changed",
+      () => this._onFullScreen(),
+      this,
     );
 
     this.animator.enable();
@@ -54,6 +55,7 @@ export default class DashAnimatorExtension extends Extension {
   }
 
   disable() {
+    this._disabled = true;
     this._disconnectThemeSettings();
     if (this.animator) this.animator.disable();
 
@@ -99,7 +101,7 @@ export default class DashAnimatorExtension extends Extension {
   }
 
   _disconnectIconEvents() {
-    this._findIcons().forEach(c => {
+    this._findIcons().forEach((c) => {
       const appIcon = c._appwell?.child?._delegate;
       if (appIcon) {
         appIcon.disconnectObject(this);
@@ -128,7 +130,7 @@ export default class DashAnimatorExtension extends Extension {
   }
 
   _applySettings() {
-    this.urgent_bounce = this._settings.get_boolean('urgent-bounce');
+    this.urgent_bounce = this._settings.get_boolean("urgent-bounce");
   }
 
   _findChildByName(actor, name, maxDepth = 4, currentDepth = 0) {
@@ -138,7 +140,12 @@ export default class DashAnimatorExtension extends Extension {
 
     const children = actor.get_children();
     for (let i = 0; i < children.length; i++) {
-      const found = this._findChildByName(children[i], name, maxDepth, currentDepth + 1);
+      const found = this._findChildByName(
+        children[i],
+        name,
+        maxDepth,
+        currentDepth + 1,
+      );
       if (found) return found;
     }
     return null;
@@ -149,7 +156,10 @@ export default class DashAnimatorExtension extends Extension {
       return false;
     }
 
-    this.dashContainer = this._findChildByName(Main.uiGroup, 'dashtodockContainer');
+    this.dashContainer = this._findChildByName(
+      Main.uiGroup,
+      "dashtodockContainer",
+    );
     if (!this.dashContainer) {
       return false;
     }
@@ -165,43 +175,60 @@ export default class DashAnimatorExtension extends Extension {
 
     this._disconnectDashEvents();
     this._disconnectIconEvents();
-    this.dash = this._findChildByName(this.dashContainer, 'dash');
+    this.dash = this._findChildByName(this.dashContainer, "dash");
     this._patchTrashUnpinDrop();
     this._iconsDirty = true;
 
     this.dash._box.connectObject(
-      'child-added', () => { this._iconsDirty = true; this._startAnimation(); },
-      'child-removed', () => { this._iconsDirty = true; this._startAnimation(); },
-      this
-    );
-    this.dash.connectObject(
-      'icon-size-changed', () => {
+      "child-added",
+      () => {
         this._iconsDirty = true;
         this._startAnimation();
       },
-      this
+      "child-removed",
+      () => {
+        this._iconsDirty = true;
+        this._startAnimation();
+      },
+      this,
+    );
+    this.dash.connectObject(
+      "icon-size-changed",
+      () => {
+        this._iconsDirty = true;
+        this._startAnimation();
+      },
+      this,
     );
 
     this.dashContainer.set_reactive(true);
     this.dashContainer.set_track_hover(true);
 
-    this.dashContainer.connectObject('destroy', () => {
-      this._iconsDirty = true;
-      this._disconnectDashEvents();
-      this._disconnectIconEvents();
-      this.dash = null;
-      if (!this.animator) return;
-      this.animator.disable();
-      this.animator.dashContainer = null;
-      this.animator.enable();
-      this.dashContainer = null;
-      if (!this._findDashIntervalId) {
-        this._findDashIntervalId = setInterval(
-          this._findDashContainer.bind(this),
-          500
-        );
-      }
-    }, this);
+    this.dashContainer.connectObject(
+      "destroy",
+      () => {
+        this._iconsDirty = true;
+        // The dash/app icons are already destroyed here by Dash to Dock, so
+        // their connections are gone; skip disconnect to avoid signal errors.
+        this.dash = null;
+        if (!this.animator) return;
+        this.animator.disable();
+        this.animator.dashContainer = null;
+        this.dashContainer = null;
+
+        // Do not recreate animation actors while the extension is disabling.
+        if (this._disabled) return;
+
+        this.animator.enable();
+        if (!this._findDashIntervalId) {
+          this._findDashIntervalId = setInterval(
+            this._findDashContainer.bind(this),
+            500,
+          );
+        }
+      },
+      this,
+    );
 
     // hooks
     this.dashContainer.__animateIn = this.dashContainer._animateIn;
@@ -248,17 +275,22 @@ export default class DashAnimatorExtension extends Extension {
     const dashChildren = this.dash._box.get_children();
 
     // hook on showApps
-    if (this.dash.showAppsButton && !this.dash.showAppsButton._dashAnimatorHooked) {
+    if (
+      this.dash.showAppsButton &&
+      !this.dash.showAppsButton._dashAnimatorHooked
+    ) {
       this.dash.showAppsButton._dashAnimatorHooked = true;
       this.dash.showAppsButton.connectObject(
-        'notify::checked',
+        "notify::checked",
         () => {
           if (!Main.overview.visible) {
-            this._findChildByName(Main.uiGroup, 'overview')
-              ?._controls?._toggleAppsPage();
+            this._findChildByName(
+              Main.uiGroup,
+              "overview",
+            )?._controls?._toggleAppsPage();
           }
         },
-        this
+        this,
       );
     }
 
@@ -292,15 +324,20 @@ export default class DashAnimatorExtension extends Extension {
       const appIcon = appwell.child && appwell.child._delegate;
       if (appIcon && !appIcon._dashAnimatorUrgentHooked) {
         appIcon._dashAnimatorUrgentHooked = true;
-        appIcon.connectObject('notify::urgent', () => {
-          if (this.urgent_bounce && appIcon.urgent) {
-            if (this.animator) this.animator.requestUrgentBounce(appwell, true);
-            if (this.dashContainer && this.dashContainer._animateIn)
-              this.dashContainer._animateIn(0.2, 0);
-          } else {
-            if (this.animator) this.animator.clearUrgentBounce(appwell);
-          }
-        }, this);
+        appIcon.connectObject(
+          "notify::urgent",
+          () => {
+            if (this.urgent_bounce && appIcon.urgent) {
+              if (this.animator)
+                this.animator.requestUrgentBounce(appwell, true);
+              if (this.dashContainer && this.dashContainer._animateIn)
+                this.dashContainer._animateIn(0.2, 0);
+            } else {
+              if (this.animator) this.animator.clearUrgentBounce(appwell);
+            }
+          },
+          this,
+        );
       }
     });
 
@@ -346,17 +383,23 @@ export default class DashAnimatorExtension extends Extension {
         if (this._canUnpinDraggedFavoriteOnTrash(source)) {
           return DND.DragMotionResult.MOVE_DROP;
         }
-        // 3. If it's NOT a favorite, explicitly return NO_DROP 
+        // 3. If it's NOT a favorite, explicitly return NO_DROP
         //    to prevent the dock from trying to pin it.
         return DND.DragMotionResult.NO_DROP;
       }
 
-      return originalHandleDragOver?.(source, actor, x, y, time) ?? DND.DragMotionResult.CONTINUE;
+      return (
+        originalHandleDragOver?.(source, actor, x, y, time) ??
+        DND.DragMotionResult.CONTINUE
+      );
     };
 
     this.dash.acceptDrop = (source, actor, x, y, time) => {
       // 1. If over trash and it's a favorite, remove it
-      if (this._isPointerOverTrash() && this._canUnpinDraggedFavoriteOnTrash(source)) {
+      if (
+        this._isPointerOverTrash() &&
+        this._canUnpinDraggedFavoriteOnTrash(source)
+      ) {
         const app = this._getDraggedApp(source);
         AppFavorites.getAppFavorites().removeFavorite(app.get_id());
         return true;
@@ -385,12 +428,19 @@ export default class DashAnimatorExtension extends Extension {
     if (!app?.get_id || app.isTrash) return false;
 
     const appId = app.get_id();
-    return global.settings.is_writable('favorite-apps') &&
-      AppFavorites.getAppFavorites().isFavorite(appId);
+    return (
+      global.settings.is_writable("favorite-apps") &&
+      AppFavorites.getAppFavorites().isFavorite(appId)
+    );
   }
 
   _getDraggedApp(source) {
-    return source?.app ?? source?._delegate?.app ?? source?.child?._delegate?.app ?? null;
+    return (
+      source?.app ??
+      source?._delegate?.app ??
+      source?.child?._delegate?.app ??
+      null
+    );
   }
 
   _isPointerOverTrash() {
@@ -401,31 +451,33 @@ export default class DashAnimatorExtension extends Extension {
     const [trashX, trashY] = trashActor.get_transformed_position();
     const [trashWidth, trashHeight] = trashActor.get_transformed_size();
 
-    return pointerX >= trashX &&
+    return (
+      pointerX >= trashX &&
       pointerX <= trashX + trashWidth &&
       pointerY >= trashY &&
-      pointerY <= trashY + trashHeight;
+      pointerY <= trashY + trashHeight
+    );
   }
 
   _getTrashActor() {
     const children = this.dash?._box ? this.dash._box.get_children() : [];
-    return children.find(actor => actor.child?._delegate?.app?.isTrash) ?? null;
+    return (
+      children.find((actor) => actor.child?._delegate?.app?.isTrash) ?? null
+    );
   }
 
   _beginAnimation() {
-    if (this.animator)
-      this.animator._beginAnimation();
+    if (this.animator) this.animator._beginAnimation();
   }
 
   _endAnimation() {
-    if (this.animator)
-      this.animator._endAnimation();
+    if (this.animator) this.animator._endAnimation();
   }
 
   _onFullScreen() {
     // Force-hide dock in fullscreen — macOS dock never shows in fullscreen
     const isFullscreen = global.display.get_monitor_in_fullscreen(
-      global.display.get_current_monitor()
+      global.display.get_current_monitor(),
     );
     if (isFullscreen) {
       if (this.dashContainer && this.dashContainer._animateOut)
@@ -438,17 +490,17 @@ export default class DashAnimatorExtension extends Extension {
   }
 
   _startAnimation() {
-    if (this.animator)
-      this.animator._startAnimation();
+    if (this.animator) this.animator._startAnimation();
   }
 
   // Returns true if any urgent icon still has first-run bounce cycles remaining.
   // Used by _animateOut to decide whether to defer the hide.
   _iconsContainer_firstRunPending() {
     if (!this.animator?._iconsContainer) return false;
-    return this.animator._iconsContainer.get_children()
-      .filter(c => c.name !== 'cupertinisator-badge')
-      .some(c => (c._appwell?._dashAnimatorUrgentFirstRunRemaining ?? 0) > 0);
+    return this.animator._iconsContainer
+      .get_children()
+      .filter((c) => c.name !== "cupertinisator-badge")
+      .some((c) => (c._appwell?._dashAnimatorUrgentFirstRunRemaining ?? 0) > 0);
   }
 
   // Called by the animator when the last first-run cycle completes,
@@ -473,20 +525,23 @@ export default class DashAnimatorExtension extends Extension {
       this._themeInTimeoutId = null;
     }
 
-    if (!this._settings.get_boolean('override-theming')) {
+    if (!this._settings.get_boolean("override-theming")) {
       this._removeThemeOverride();
       if (this.animator) this.animator.reloadIcons();
       return;
     }
 
-    const theme = this._settings.get_string('dock-theme');
-    const aware = this._settings.get_boolean('theme-aware');
+    const theme = this._settings.get_string("dock-theme");
+    const aware = this._settings.get_boolean("theme-aware");
     let scheme;
 
     if (aware) {
-      scheme = this._desktopSettings.get_string('color-scheme') === 'prefer-dark' ? 'dark' : 'light';
+      scheme =
+        this._desktopSettings.get_string("color-scheme") === "prefer-dark"
+          ? "dark"
+          : "light";
     } else {
-      scheme = this._settings.get_string('dock-color-scheme');
+      scheme = this._settings.get_string("dock-color-scheme");
     }
 
     const fileName = `${theme}-${scheme}.css`;
@@ -514,31 +569,39 @@ export default class DashAnimatorExtension extends Extension {
           stTheme.load_stylesheet(cssFile);
           this._loadedThemeFile = cssFile;
 
-          themeContext.emit('changed');
+          themeContext.emit("changed");
           if (this.animator) this.animator.reloadIcons();
 
           // Slide back in after theme is applied — use wrapper so _pendingHide
           // is cleared and urgent bounce resumes if still active.
-          this._themeInTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
-            this._themeInTimeoutId = null;
-            if (this.dashContainer && this.dashContainer._animateIn)
-              this.dashContainer._animateIn(0.2, 0);
-            return GLib.SOURCE_REMOVE;
-          });
+          this._themeInTimeoutId = GLib.timeout_add(
+            GLib.PRIORITY_DEFAULT,
+            50,
+            () => {
+              this._themeInTimeoutId = null;
+              if (this.dashContainer && this.dashContainer._animateIn)
+                this.dashContainer._animateIn(0.2, 0);
+              return GLib.SOURCE_REMOVE;
+            },
+          );
         };
 
         // Slide out first, apply theme after animation completes, then slide back in
         if (this.dashContainer && this.dashContainer.__animateOut) {
           this.dashContainer.__animateOut(0.2, 0);
-          this._themeApplyTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => {
-            this._themeApplyTimeoutId = null;
-            applyThemeNow();
-            return GLib.SOURCE_REMOVE;
-          });
+          this._themeApplyTimeoutId = GLib.timeout_add(
+            GLib.PRIORITY_DEFAULT,
+            250,
+            () => {
+              this._themeApplyTimeoutId = null;
+              applyThemeNow();
+              return GLib.SOURCE_REMOVE;
+            },
+          );
         } else {
           applyThemeNow();
         }
-      }
+      },
     );
   }
 
@@ -547,7 +610,7 @@ export default class DashAnimatorExtension extends Extension {
       try {
         const themeContext = St.ThemeContext.get_for_stage(global.stage);
         themeContext.get_theme().unload_stylesheet(this._loadedThemeFile);
-      } catch (e) { }
+      } catch (e) {}
       this._loadedThemeFile = null;
     }
   }
@@ -557,16 +620,26 @@ export default class DashAnimatorExtension extends Extension {
 
     // Re-apply whenever any relevant setting changes
     s.connectObject(
-      'changed::override-theming', () => this._applyThemeOverride(),
-      'changed::dock-theme', () => this._applyThemeOverride(),
-      'changed::theme-aware', () => this._applyThemeOverride(),
-      'changed::dock-color-scheme', () => this._applyThemeOverride(),
-      this
+      "changed::override-theming",
+      () => this._applyThemeOverride(),
+      "changed::dock-theme",
+      () => this._applyThemeOverride(),
+      "changed::theme-aware",
+      () => this._applyThemeOverride(),
+      "changed::dock-color-scheme",
+      () => this._applyThemeOverride(),
+      this,
     );
 
     // Follow system color-scheme changes
-    this._desktopSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
-    this._desktopSettings.connectObject('changed::color-scheme', () => this._applyThemeOverride(), this);
+    this._desktopSettings = new Gio.Settings({
+      schema_id: "org.gnome.desktop.interface",
+    });
+    this._desktopSettings.connectObject(
+      "changed::color-scheme",
+      () => this._applyThemeOverride(),
+      this,
+    );
 
     this._applyThemeOverride();
   }
@@ -587,5 +660,4 @@ export default class DashAnimatorExtension extends Extension {
     }
     this._removeThemeOverride();
   }
-
 }

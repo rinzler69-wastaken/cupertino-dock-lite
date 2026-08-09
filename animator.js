@@ -527,7 +527,7 @@ export class Animator {
       'drag-end', () => {
         this._dragging = false;
         if (draggable) {
-          draggable.disconnectObject(this);
+          this._safeDisconnectObject(draggable, this);
         }
         this._draggableHooks = this._draggableHooks.filter(d => d !== draggable);
         if (this.extension?.animator === this) {
@@ -550,7 +550,20 @@ export class Animator {
 
   _disconnectDraggableHook(draggable) {
     if (draggable) {
-      draggable.disconnectObject(this);
+      // A dock rebuild can destroy the draggable before disable(); GJS then
+      // has already removed its signal connections.
+      this._safeDisconnectObject(draggable, this);
+    }
+  }
+
+  _safeDisconnectObject(object, owner) {
+    try {
+      object.disconnectObject(owner);
+    } catch (error) {
+      // Destroyed actors may keep stale SignalTracker entries; treat the
+      // known stale-connection error as already-cleaned state.
+      if (!String(error).includes('No signal connection'))
+        throw error;
     }
   }
 
